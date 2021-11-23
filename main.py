@@ -28,7 +28,7 @@ training = pd.read_csv('training_data.csv' ,sep=',', encoding='gbk')
 
 clean = training.drop('AVERAGE_RAIN',1)
 clean = clean.drop('AVERAGE_PRECIPITATION',1)
-clean = clean.fillna(method='ffill')
+clean = clean.fillna(method='bfill').fillna(method='ffill')
 
 
 #plt.scatter( training['AVERAGE_SPEED_DIFF'], training['AVERAGE_FREE_FLOW_SPEED'] )
