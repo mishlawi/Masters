@@ -149,10 +149,8 @@ training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].apply(rainType)
 
 
 training = training.interpolate(method = 'linear').fillna(method='bfill')
-#
-
-#linear.interpolate(method= 'pad')
-#slinear = training.interpolate(method = 'slinear')
+# ha varias funcoes de interpolação
+# training = training.interpolate(method = 'time') ver isto nao sei mexer nas datas
 
 
 
