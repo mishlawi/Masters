@@ -16,19 +16,107 @@ from sklearn.model_selection import train_test_split
 
 #print(training.head())
 
-training = pd.read_csv('training_data.csv' ,sep=',', encoding='gbk')
+training = pd.read_csv('training_data.csv', encoding='latin')
 
-  #estes prints so sao dados, depois remove-se
-   #print(training.isna().any())
-   #print(training.isna().sum()) # nr de elementos em falta
-   
-   # o parametro avg_rain ou está a NULL ou está em falta, em cada row
-   # por isso vou cortá-lo
-   # o parametro avg_precipitation esta sempre a 0, corto? up of debate porque pode nao ter chovido xD
 
-clean = training.drop('AVERAGE_RAIN',1)
-clean = clean.drop('AVERAGE_PRECIPITATION',1)
+'''
+# COMPUTADOR DO BARATA 
+    
+import os
+# get current working directory
+cwd = os.getcwd()
+print(cwd)
+
+os.chdir('D:\OneDrive - Mestrado\OneDrive - Universidade do Minho\MEI\DAA\TP\daa') # relative path: scripts dir is under Lab
+os.getcwd()
+
+#get files in directory
+files = os.listdir(cwd) 
+
+print(files)
+'''
+
+
+'''
+ELIMINAR COLUNAS SEM INFORMACAO
+'''
+# AVERAGE_PRECIPITATION
+training = training.drop('AVERAGE_PRECIPITATION',1)
+
+
+'''
+REMOVER LINHAS ERRADAS NO DATASET
+'''
+training['record_date'] = pd.to_datetime(training['record_date'], errors='coerce')
+training = training.dropna(subset=['record_date'])
+
+
+'''
+VERIFICAR VALORES NUMA DETERMINADA COLUNA
+'''
+# AVERAGE_RAIN
+training.AVERAGE_RAIN.unique() 
+
+# AVERAGE_CLOUDINESS
+training.AVERAGE_CLOUDINESS.unique() 
+
+'''
+LIMPEZA DE VALORES
+'''
+# AVERAGE_RAIN
+training.loc[training.AVERAGE_RAIN == 'chuva leve'] = 'chuva fraca' 
+training.loc[training.AVERAGE_RAIN == 'chuvisco fraco'] = 'chuva fraca' 
+training.loc[training.AVERAGE_RAIN == 'chuvisco e chuva fraca'] = 'chuva fraca' 
+training.loc[training.AVERAGE_RAIN == 'chuva'] = 'chuva moderada' 
+training.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesada'] = 'chuva forte' 
+training.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesado'] = 'chuva forte' 
+
+# AVERAGE_CLOUDINESS
+training.loc[training.AVERAGE_CLOUDINESS == 'céu claro'] = 'céu limpo'
+training.loc[training.AVERAGE_CLOUDINESS == 'algumas nuvens'] = 'céu pouco nublado'
+training.loc[training.AVERAGE_CLOUDINESS == 'nuvens dispersas'] = 'céu pouco nublado'
+training.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebrados'] = 'céu pouco nublado'
+training.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebradas'] = 'céu pouco nublado'
+training.loc[training.AVERAGE_CLOUDINESS == 'tempo nublado'] = 'céu nublado'
+training.loc[training.AVERAGE_CLOUDINESS == 'nublado'] = 'céu nublado'
+
+training.loc[training.AVERAGE_CLOUDINESS == 'céu limpo', 'AVERAGE_RAIN'] = 0
+
+
+'''
+TRANSFORMACAO EM VALORES NUMERICOS
+'''
+# AVERAGE_RAIN
+def rainType(chuva):
+    if( chuva == 'aguaceiros fracos' ):
+        return 1/7
+    elif( chuva == 'aguaceiros' ):
+        return 2/7
+    elif( chuva == 'chuva fraca' ):
+        return 3/7
+    elif( chuva == 'chuva moderada' ):
+        return 4/7
+    elif( chuva == 'trovoada com chuva leve' ):
+        return 5/7
+    elif( chuva == 'chuva forte' ):
+        return 6/7
+    elif( chuva == 'trovoada com chuva' ):        
+        return 7/7
+
+'''
+ALTERAR OS VALORES TEXTUAIS PARA NUMERICOS 
+'''
+training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].apply(rainType)
+
+
+training.AVERAGE_CLOUDINESS.unique()
+
+
+
+clean = training.drop('AVERAGE_PRECIPITATION',1)
 clean = clean.fillna(method='bfill').fillna(method='ffill')
+
+
 
 
 #plt.scatter( training['AVERAGE_SPEED_DIFF'], training['AVERAGE_FREE_FLOW_SPEED'] )
