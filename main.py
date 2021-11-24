@@ -148,6 +148,12 @@ training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].apply(rainType)
 # clean = clean.fillna(method='bfill').fillna(method='ffill')
 
 
+training = training.interpolate(method = 'linear').fillna(method='bfill')
+#
+
+#linear.interpolate(method= 'pad')
+#slinear = training.interpolate(method = 'slinear')
+
 
 
 #plt.scatter( training['AVERAGE_SPEED_DIFF'], training['AVERAGE_FREE_FLOW_SPEED'] )
