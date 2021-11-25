@@ -139,6 +139,7 @@ training['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].apply(weatherTyp
 training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].apply(rainType)
 
 
+training = training.sort_values(by=['record_date'])
 
 #######################################################################
 # OS VALORES TEXTUAIS ESTAO TODOS EM NUMERICO NESTE PONTO. E NECESSARIO VER COMO FAZER AS INTERPOLACOES
@@ -147,8 +148,10 @@ training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].apply(rainType)
 # clean = training.drop('AVERAGE_PRECIPITATION',1)
 # clean = clean.fillna(method='bfill').fillna(method='ffill')
 
+# NAO FUNCIONA----------
 
-training = training.interpolate(method = 'linear').fillna(method='bfill')
+# training = training.interpolate(method = 'linear').fillna(method='bfill')
+# training = training.interpolate(method ='linear', limit_direction ='forward')
 # ha varias funcoes de interpolação
 # training = training.interpolate(method = 'time') ver isto nao sei mexer nas datas
 
