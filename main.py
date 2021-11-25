@@ -221,7 +221,7 @@ clf.fit(x_train,y_train)
 
 predictions = clf.predict(x_test)
 
-predictiontest = clf.predict(test) 
+predictionstest = clf.predict(test) 
 
 # métricas de qualidade e avaliação do modelo
 # ------- dados contínuos -------
@@ -245,7 +245,7 @@ predictions.index.name='RowId'
 predictions.index += 1 
 predictions.to_csv("./predictions.csv")
 
-predictiontest = pd.DataFrame(predictiontest, columns=['Speed_Diff'])
-predictiontest.index.name='RowId'
-predictiontest.index += 1 
-predictiontest.to_csv("./predictionstest.csv")
+predictionstest = pd.DataFrame(predictionstest, columns=['Speed_Diff'])
+predictionstest.index.name='RowId'
+predictionstest.index += 1 
+predictionstest.to_csv("./predictionstest.csv")
