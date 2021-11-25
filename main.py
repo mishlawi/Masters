@@ -10,8 +10,13 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import confusion_matrix
 
 '''
 LEITURA DO DATASET
@@ -131,7 +136,9 @@ def rainType(chuva):
 ALTERAR OS VALORES TEXTUAIS PARA NUMERICOS 
 '''
 # AVERAGE_SPEED_DIFF
-training['AVERAGE_SPEED_DIFF'] = training['AVERAGE_SPEED_DIFF'].apply(speedType)
+# acho que esta coluna não devia passar para numérica, porque são estes dados que temos que treinar 
+# o modelo para prever, e na submissão tem que ir textual, então acho que faz sentido deixar textual
+#training['AVERAGE_SPEED_DIFF'] = training['AVERAGE_SPEED_DIFF'].apply(speedType)
 
 # LUMINOSITY
 training['LUMINOSITY'] = training['LUMINOSITY'].apply(luminosityType)
@@ -180,15 +187,29 @@ x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
 x_train = x_train.drop(['city_name','record_date'],axis=1)
 x_test = x_test.drop(['city_name','record_date'],axis=1)
 
-clf = DecisionTreeRegressor(random_state=2021)
+# para dados contínuos
+#clf = DecisionTreeRegressor(random_state=2021)
+#para dados não contínuos
+clf = DecisionTreeClassifier(random_state=2021)
 
 clf.fit(x_train,y_train)
 
 predictions = clf.predict(x_test)
 
 # métricas de qualidade e avaliação do modelo
-#mae
-mean_absolute_error(y_test,predictions)
-#mse             
-mean_squared_error(y_test,predictions)
+# ------- dados contínuos -------
+# mae - measures the average magnitude of the errors (express the error in units pf the variable of interest)
+# mean_absolute_error(y_test,predictions)
+# mse - measure the average of squared error (squaring the error, gives high wait to large errors)
+# mean_squared_error(y_test,predictions)
+
+# ------- apenas para dados não continuos -------
+# accuracy
+accuracy_score(y_test,predictions)
+# precision aka sensitivity - measure of exactness (determines the fraction of relevant items aomg the retrieved)
+precision_score(y_test,predictions,average='macro')
+# recall aka specificity - measure of completeness (determines the fraction of relevant items that were obtained)
+recall_score(y_test,predictions,average='macro')
+# true and false positives and negatives        
+confusion_matrix(y_test,predictions)
 '''
