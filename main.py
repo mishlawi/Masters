@@ -23,14 +23,14 @@ LEITURA DO DATASET
 '''
 # os.chdir('D:\OneDrive - Mestrado\OneDrive - Universidade do Minho\MEI\DAA\TP\daa') 
 training = pd.read_csv('training_data.csv', encoding='latin')
-
+test = pd.read_csv('test_data.csv', encoding='latin')
 
 '''
 ELIMINAR COLUNAS SEM INFORMACAO
 '''
 # AVERAGE_PRECIPITATION
 training = training.drop('AVERAGE_PRECIPITATION',1)
-
+test = test.drop('AVERAGE_PRECIPITATION',1)
 
 '''
 REMOVER LINHAS ERRADAS NO DATASET
@@ -38,6 +38,8 @@ REMOVER LINHAS ERRADAS NO DATASET
 '''
 training['record_date'] = pd.to_datetime(training['record_date'], errors='coerce')
 training = training.dropna(subset=['record_date'])
+test['record_date'] = pd.to_datetime(test['record_date'], errors='coerce')
+test = test.dropna(subset=['record_date'])
 
 
 '''
@@ -68,6 +70,14 @@ training.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebradas', 'AVERAGE_CLOUDIN
 training.loc[training.AVERAGE_CLOUDINESS == 'tempo nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
 training.loc[training.AVERAGE_CLOUDINESS == 'nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
 
+test.loc[training.AVERAGE_CLOUDINESS == 'céu claro', 'AVERAGE_CLOUDINESS'] = 'céu limpo'
+test.loc[training.AVERAGE_CLOUDINESS == 'algumas nuvens', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
+test.loc[training.AVERAGE_CLOUDINESS == 'nuvens dispersas', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
+test.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebrados', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
+test.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebradas', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
+test.loc[training.AVERAGE_CLOUDINESS == 'tempo nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
+test.loc[training.AVERAGE_CLOUDINESS == 'nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
+
 # AVERAGE_RAIN
 training.loc[training.AVERAGE_RAIN == 'chuva leve', 'AVERAGE_RAIN'] = 'chuva fraca' 
 training.loc[training.AVERAGE_RAIN == 'chuvisco fraco', 'AVERAGE_RAIN'] = 'chuva fraca' 
@@ -76,6 +86,14 @@ training.loc[training.AVERAGE_RAIN == 'chuva', 'AVERAGE_RAIN'] = 'chuva moderada
 training.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesada', 'AVERAGE_RAIN'] = 'chuva forte' 
 training.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesado', 'AVERAGE_RAIN'] = 'chuva forte' 
 training.loc[training.AVERAGE_CLOUDINESS == 'céu limpo', 'AVERAGE_RAIN'] = 'sem chuva'
+
+test.loc[training.AVERAGE_RAIN == 'chuva leve', 'AVERAGE_RAIN'] = 'chuva fraca' 
+test.loc[training.AVERAGE_RAIN == 'chuvisco fraco', 'AVERAGE_RAIN'] = 'chuva fraca' 
+test.loc[training.AVERAGE_RAIN == 'chuvisco e chuva fraca', 'AVERAGE_RAIN'] = 'chuva fraca' 
+test.loc[training.AVERAGE_RAIN == 'chuva', 'AVERAGE_RAIN'] = 'chuva moderada' 
+test.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesada', 'AVERAGE_RAIN'] = 'chuva forte' 
+test.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesado', 'AVERAGE_RAIN'] = 'chuva forte' 
+test.loc[training.AVERAGE_CLOUDINESS == 'céu limpo', 'AVERAGE_RAIN'] = 'sem chuva'
 
 
 '''
@@ -142,15 +160,19 @@ ALTERAR OS VALORES TEXTUAIS PARA NUMERICOS
 
 # LUMINOSITY
 training['LUMINOSITY'] = training['LUMINOSITY'].apply(luminosityType)
+test['LUMINOSITY'] = test['LUMINOSITY'].apply(luminosityType)
 
 # AVERAGE_CLOUDINESS
 training['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].apply(weatherType)
+test['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].apply(weatherType)
 
 # AVERAGE_RAIN
 training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].apply(rainType)
+test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].apply(rainType)
 
 
 training = training.sort_values(by=['record_date'])
+test = test.sort_values(by=['record_date'])
 
 #######################################################################
 # OS VALORES TEXTUAIS ESTAO TODOS EM NUMERICO NESTE PONTO. E NECESSARIO VER COMO FAZER AS INTERPOLACOES
@@ -163,6 +185,8 @@ training = training.sort_values(by=['record_date'])
 
 training['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
 training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
+test['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
+test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
 # training = training.interpolate(method ='linear', limit_direction ='forward')
 # ha varias funcoes de interpolação
 # training = training.interpolate(method = 'time') ver isto nao sei mexer nas datas
@@ -177,7 +201,7 @@ training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'linear
 
 
 #to be used
-'''
+
 x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 y = training['AVERAGE_SPEED_DIFF'].to_frame()
 x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
@@ -186,6 +210,7 @@ x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
 # also: outros métodos de treino/previsão?
 x_train = x_train.drop(['city_name','record_date'],axis=1)
 x_test = x_test.drop(['city_name','record_date'],axis=1)
+test = test.drop(['city_name','record_date'],axis=1)
 
 # para dados contínuos
 #clf = DecisionTreeRegressor(random_state=2021)
@@ -195,6 +220,8 @@ clf = DecisionTreeClassifier(random_state=2021)
 clf.fit(x_train,y_train)
 
 predictions = clf.predict(x_test)
+
+predictiontest = clf.predict(test) 
 
 # métricas de qualidade e avaliação do modelo
 # ------- dados contínuos -------
@@ -212,4 +239,13 @@ precision_score(y_test,predictions,average='macro')
 recall_score(y_test,predictions,average='macro')
 # true and false positives and negatives        
 confusion_matrix(y_test,predictions)
-'''
+
+predictions = pd.DataFrame(predictions, columns=['Speed_Diff'])
+predictions.index.name='RowId'
+predictions.index += 1 
+predictions.to_csv("./predictions.csv")
+
+predictiontest = pd.DataFrame(predictiontest, columns=['Speed_Diff'])
+predictiontest.index.name='RowId'
+predictiontest.index += 1 
+predictiontest.to_csv("./predictionstest.csv")
