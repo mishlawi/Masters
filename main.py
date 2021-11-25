@@ -4,10 +4,14 @@ Created on Mon Nov 22 18:46:11 2021
 
 @author: via
 """
-import os
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
 
 '''
 LEITURA DO DATASET
@@ -97,11 +101,11 @@ def luminosityType(lux):
 # AVERAGE_CLOUDINESS
 def weatherType(tempo):
     if( tempo == 'céu limpo' ):
-        return 0.0
+        return 0
     elif( tempo == 'céu pouco nublado' ):
-        return 0.5
+        return 1/2
     elif( tempo == 'céu nublado' ):
-        return 1
+        return 2/2
 
 # AVERAGE_RAIN
 def rainType(chuva):
@@ -148,9 +152,10 @@ training = training.sort_values(by=['record_date'])
 # clean = training.drop('AVERAGE_PRECIPITATION',1)
 # clean = clean.fillna(method='bfill').fillna(method='ffill')
 
-# NAO FUNCIONA----------
+# JÁ FUNCIONA----------
 
-# training = training.interpolate(method = 'linear').fillna(method='bfill')
+training['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
+training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
 # training = training.interpolate(method ='linear', limit_direction ='forward')
 # ha varias funcoes de interpolação
 # training = training.interpolate(method = 'time') ver isto nao sei mexer nas datas
@@ -159,10 +164,31 @@ training = training.sort_values(by=['record_date'])
 
 #plt.scatter( training['AVERAGE_SPEED_DIFF'], training['AVERAGE_FREE_FLOW_SPEED'] )
 
+# FARÁ SENTIDO NORMALIZAR ESTES VALORES? 
+# min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0,1))
+# training['AVERAGE_FREE_FLOW_SPEED'] = min_max_scaler.fit_transform(training[['AVERAGE_FREE_FLOW_SPEED']])
+
 
 #to be used
-"""
-X = training[['AVERAGE_FREE_FLOW_SPEED','AVERAGE_TIME_DIFF','AVERAGE_FREE_FLOW_TIME','LUMINOSITY','AVERAGE_TEMPERATURE','AVERAGE_ATMOSP_PRESSURE','AVERAGE_HUMIDITY','AVERAGE_WIND_SPEED','AVERAGE_CLOUDINESS','AVERAGE_PRECIPITATION','AVERAGE_RAIN']] 
-y= training['AVERAGE_SPEED_DIFF']
-X_train,x_test,Y_train,y_test = train_test_split(X,y,test_size=0.2)
-"""
+'''
+x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
+y = training['AVERAGE_SPEED_DIFF'].to_frame()
+x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
+
+# drop de colunas textuais e datetime não suportadas pelo DecisionTree
+# also: outros métodos de treino/previsão?
+x_train = x_train.drop(['city_name','record_date'],axis=1)
+x_test = x_test.drop(['city_name','record_date'],axis=1)
+
+clf = DecisionTreeRegressor(random_state=2021)
+
+clf.fit(x_train,y_train)
+
+predictions = clf.predict(x_test)
+
+# métricas de qualidade e avaliação do modelo
+#mae
+mean_absolute_error(y_test,predictions)
+#mse             
+mean_squared_error(y_test,predictions)
+'''
