@@ -18,6 +18,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import confusion_matrix
+from sklearn.neighbors import KNeighborsClassifier
 
 '''
 LEITURA DO DATASET
@@ -30,8 +31,8 @@ test = pd.read_csv('test_data.csv', encoding='latin')
 ELIMINAR COLUNAS SEM INFORMACAO
 '''
 # AVERAGE_PRECIPITATION
-training = training.drop('AVERAGE_PRECIPITATION',1)
-test = test.drop('AVERAGE_PRECIPITATION',1)
+training = training.drop('AVERAGE_PRECIPITATION',axis=1)
+test = test.drop('AVERAGE_PRECIPITATION',axis=1)
 
 '''
 REMOVER LINHAS ERRADAS NO DATASET
@@ -164,6 +165,19 @@ ALTERAR OS VALORES TEXTUAIS PARA NUMERICOS
 training['LUMINOSITY'] = training['LUMINOSITY'].apply(luminosityType)
 test['LUMINOSITY'] = test['LUMINOSITY'].apply(luminosityType)
 
+'''
+# NAO FUNCIONA aqui mas no colab funciona
+# enconded altera os valores textuais para numéricos (acaba por ser o mesmo que estamos a fazer,
+# e a diferença no score é nenhum por isso tbem não interessa muito acho eu)
+'''
+#from sklearn.preprocessing import LabelEncoder
+#label_encoder = LabelEncoder()
+#encoded_luminosity = label_encoder.fit_transform(training[["LUMINOSITY"]])
+#training[["LUMINOSITY"]] = encoded_luminosity
+#encoded_luminosity = label_encoder.fit_transform(test[["LUMINOSITY"]])
+#test[["LUMINOSITY"]] = encoded_luminosity
+
+
 # AVERAGE_CLOUDINESS
 training['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].apply(weatherType)
 test['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].apply(weatherType)
@@ -195,19 +209,17 @@ test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'linear').filln
 #training = training.interpolate(method = 'time') ver isto nao sei mexer nas datas
 
 
-
 #plt.scatter( training['AVERAGE_SPEED_DIFF'], training['AVERAGE_FREE_FLOW_SPEED'] )
 
+# matriz de correlação - ajuda a perceber se há colunas redundantes
 corr_matrix = training.corr()
 f,ax = plt.subplots(figsize=(8,6))
 sns.heatmap(corr_matrix,vmin=-1,vmax=1,square=True,annot=True)
 
 # FARÁ SENTIDO NORMALIZAR ESTES VALORES? 
-# min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0,1))
-# training['AVERAGE_FREE_FLOW_SPEED'] = min_max_scaler.fit_transform(training[['AVERAGE_FREE_FLOW_SPEED']])
-
-
-#to be used
+#min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0,1))
+#training['AVERAGE_FREE_FLOW_SPEED'] = min_max_scaler.fit_transform(training[['AVERAGE_FREE_FLOW_SPEED']])
+#test['AVERAGE_FREE_FLOW_SPEED'] = min_max_scaler.fit_transform(test[['AVERAGE_FREE_FLOW_SPEED']])
 
 x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 y = training['AVERAGE_SPEED_DIFF'].to_frame()
@@ -220,12 +232,19 @@ x_test = x_test.drop(['city_name','record_date'],axis=1)
 x = x.drop(['city_name','record_date'],axis=1)
 test = test.drop(['city_name','record_date'],axis=1)
 
+# outro método de treino
+#knn = KNeighborsClassifier(n_neighbors=3);
+#knn.fit(x,y.values.ravel())
+#print(knn.score(test, y_test))
+
+
 # para dados contínuos
 #clf = DecisionTreeRegressor(random_state=2021)
+
 # para dados não contínuos
 clf = DecisionTreeClassifier(random_state=2021)
 
-clf.fit(x_test,y_test)
+clf.fit(x,y)
 
 predictions = clf.predict(x_test)
 
