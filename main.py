@@ -7,6 +7,7 @@ Created on Mon Nov 22 18:46:11 2021
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn.tree import DecisionTreeRegressor
@@ -64,7 +65,6 @@ LIMPEZA DE VALORES
 # AVERAGE_CLOUDINESS
 training.loc[training.AVERAGE_CLOUDINESS == 'céu claro', 'AVERAGE_CLOUDINESS'] = 'céu limpo'
 training.loc[training.AVERAGE_CLOUDINESS == 'algumas nuvens', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
-training.loc[training.AVERAGE_CLOUDINESS == 'nuvens dispersas', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
 training.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebrados', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
 training.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebradas', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
 training.loc[training.AVERAGE_CLOUDINESS == 'tempo nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
@@ -85,7 +85,7 @@ training.loc[training.AVERAGE_RAIN == 'chuvisco e chuva fraca', 'AVERAGE_RAIN'] 
 training.loc[training.AVERAGE_RAIN == 'chuva', 'AVERAGE_RAIN'] = 'chuva moderada' 
 training.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesada', 'AVERAGE_RAIN'] = 'chuva forte' 
 training.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesado', 'AVERAGE_RAIN'] = 'chuva forte' 
-training.loc[training.AVERAGE_CLOUDINESS == 'céu limpo', 'AVERAGE_RAIN'] = 'sem chuva'
+training.loc[training.AVERAGE_RAIN == 'céu limpo', 'AVERAGE_RAIN'] = 'sem chuva'
 
 test.loc[training.AVERAGE_RAIN == 'chuva leve', 'AVERAGE_RAIN'] = 'chuva fraca' 
 test.loc[training.AVERAGE_RAIN == 'chuvisco fraco', 'AVERAGE_RAIN'] = 'chuva fraca' 
@@ -93,13 +93,14 @@ test.loc[training.AVERAGE_RAIN == 'chuvisco e chuva fraca', 'AVERAGE_RAIN'] = 'c
 test.loc[training.AVERAGE_RAIN == 'chuva', 'AVERAGE_RAIN'] = 'chuva moderada' 
 test.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesada', 'AVERAGE_RAIN'] = 'chuva forte' 
 test.loc[training.AVERAGE_RAIN == 'chuva de intensidade pesado', 'AVERAGE_RAIN'] = 'chuva forte' 
-test.loc[training.AVERAGE_CLOUDINESS == 'céu limpo', 'AVERAGE_RAIN'] = 'sem chuva'
+test.loc[training.AVERAGE_RAIN == 'céu limpo', 'AVERAGE_RAIN'] = 'sem chuva'
 
 
 '''
 FUNCOES DE TRANSFORMACAO EM VALORES NUMERICOS
 '''
 # AVERAGE_SPEED_DIFF
+'''
 def speedType(vel):
     if( vel == 'None'):
         return 0
@@ -111,6 +112,7 @@ def speedType(vel):
         return 3/4
     elif( vel == 'Very_High'):
         return 4/4
+'''
     
 # LUMINOSITY
 def luminosityType(lux):
@@ -175,25 +177,30 @@ training = training.sort_values(by=['record_date'])
 test = test.sort_values(by=['record_date'])
 
 #######################################################################
-# OS VALORES TEXTUAIS ESTAO TODOS EM NUMERICO NESTE PONTO. E NECESSARIO VER COMO FAZER AS INTERPOLACOES
+# OS VALORES TEXTUAIS ESTAO TODOS EM NUMERICO NESTE PONTO
 
 
-# clean = training.drop('AVERAGE_PRECIPITATION',1)
-# clean = clean.fillna(method='bfill').fillna(method='ffill')
 
-# JÁ FUNCIONA----------
-
+'''
+INTERPOLACAO PARA PREENCHIMENTO DE CÉLULAS VAZIAS
+'''
 training['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
 training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
 test['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
 test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
-# training = training.interpolate(method ='linear', limit_direction ='forward')
+
+# não funciona
+#training = training.interpolate(method ='linear', limit_direction ='forward')
 # ha varias funcoes de interpolação
-# training = training.interpolate(method = 'time') ver isto nao sei mexer nas datas
+#training = training.interpolate(method = 'time') ver isto nao sei mexer nas datas
 
 
 
 #plt.scatter( training['AVERAGE_SPEED_DIFF'], training['AVERAGE_FREE_FLOW_SPEED'] )
+
+corr_matrix = training.corr()
+f,ax = plt.subplots(figsize=(8,6))
+sns.heatmap(corr_matrix,vmin=-1,vmax=1,square=True,annot=True)
 
 # FARÁ SENTIDO NORMALIZAR ESTES VALORES? 
 # min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0,1))
@@ -204,41 +211,43 @@ test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'linear').filln
 
 x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 y = training['AVERAGE_SPEED_DIFF'].to_frame()
-x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
+x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2201)
 
 # drop de colunas textuais e datetime não suportadas pelo DecisionTree
 # also: outros métodos de treino/previsão?
 x_train = x_train.drop(['city_name','record_date'],axis=1)
 x_test = x_test.drop(['city_name','record_date'],axis=1)
+x = x.drop(['city_name','record_date'],axis=1)
 test = test.drop(['city_name','record_date'],axis=1)
 
 # para dados contínuos
 #clf = DecisionTreeRegressor(random_state=2021)
-#para dados não contínuos
+# para dados não contínuos
 clf = DecisionTreeClassifier(random_state=2021)
 
-clf.fit(x_train,y_train)
+clf.fit(x_test,y_test)
 
 predictions = clf.predict(x_test)
 
-predictionstest = clf.predict(test) 
+predictionstest = clf.predict(test)
 
 # métricas de qualidade e avaliação do modelo
 # ------- dados contínuos -------
 # mae - measures the average magnitude of the errors (express the error in units pf the variable of interest)
-# mean_absolute_error(y_test,predictions)
+#mean_absolute_error(test,predictions)
 # mse - measure the average of squared error (squaring the error, gives high wait to large errors)
-# mean_squared_error(y_test,predictions)
+#mean_squared_error(test,predictions)
 
 # ------- apenas para dados não continuos -------
 # accuracy
-accuracy_score(y_test,predictions)
+# SCORE QUE TEREMOS NA SUBMISSÃO (em principio)
+pseudoScore = accuracy_score(y_test,predictionstest)
 # precision aka sensitivity - measure of exactness (determines the fraction of relevant items aomg the retrieved)
-precision_score(y_test,predictions,average='macro')
+#precision_score(y_test,predictions,average='macro')
 # recall aka specificity - measure of completeness (determines the fraction of relevant items that were obtained)
-recall_score(y_test,predictions,average='macro')
+#recall_score(y_test,predictions,average='macro')
 # true and false positives and negatives        
-confusion_matrix(y_test,predictions)
+#confusion_matrix(y_test,predictions)
 
 predictions = pd.DataFrame(predictions, columns=['Speed_Diff'])
 predictions.index.name='RowId'
