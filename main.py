@@ -165,11 +165,15 @@ ALTERAR OS VALORES TEXTUAIS PARA NUMERICOS
 training['LUMINOSITY'] = training['LUMINOSITY'].apply(luminosityType)
 test['LUMINOSITY'] = test['LUMINOSITY'].apply(luminosityType)
 
+
 '''
+
 # NAO FUNCIONA aqui mas no colab funciona
 # enconded altera os valores textuais para numéricos (acaba por ser o mesmo que estamos a fazer,
 # e a diferença no score é nenhum por isso tbem não interessa muito acho eu)
+
 '''
+
 #from sklearn.preprocessing import LabelEncoder
 #label_encoder = LabelEncoder()
 #encoded_luminosity = label_encoder.fit_transform(training[["LUMINOSITY"]])
@@ -186,32 +190,55 @@ test['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].apply(weatherType)
 training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].apply(rainType)
 test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].apply(rainType)
 
-
+# O index (ordem) do dataSet passa a ser definido pela data 
 training = training.sort_values(by=['record_date'])
 test = test.sort_values(by=['record_date'])
-
-#######################################################################
-# OS VALORES TEXTUAIS ESTAO TODOS EM NUMERICO NESTE PONTO
+training.index = training['record_date']
 
 
+#  OS VALORES TEXTUAIS ESTAO TODOS EM NUMERICO NESTE PONTO #
 
-'''
-INTERPOLACAO PARA PREENCHIMENTO DE CÉLULAS VAZIAS
-'''
-training['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
-training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
+#..~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~..#
+# DIFERENTES INTERPOLACOES PARA PREENCHIMENTO DE CÉLULAS VAZIAS 
+#..~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~..#
+
+
+
+# interpolação por meio da data
+data = training
+data['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'time').fillna(method='bfill')
+data['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'time').fillna(method='bfill')
+
+
+# interpolação pelo index
+indexInterpolation = training
+indexInterpolation['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method='index').fillna(method='bfill')
+indexInterpolation['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'index').fillna(method='bfill')
+
+
+
+# interpolaçao linear
+linearInterpolation = training
+linearInterpolation['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
+linearInterpolation['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
+
+
+
+ 
+
+
 test['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
 test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
 
 # não funciona
 #training = training.interpolate(method ='linear', limit_direction ='forward')
 # ha varias funcoes de interpolação
-#training = training.interpolate(method = 'time') ver isto nao sei mexer nas datas
 
 
 #plt.scatter( training['AVERAGE_SPEED_DIFF'], training['AVERAGE_FREE_FLOW_SPEED'] )
 
 # matriz de correlação - ajuda a perceber se há colunas redundantes
+
 corr_matrix = training.corr()
 f,ax = plt.subplots(figsize=(8,6))
 sns.heatmap(corr_matrix,vmin=-1,vmax=1,square=True,annot=True)
@@ -232,16 +259,12 @@ x_test = x_test.drop(['city_name','record_date'],axis=1)
 x = x.drop(['city_name','record_date'],axis=1)
 test = test.drop(['city_name','record_date'],axis=1)
 
-# outro método de treino
-#knn = KNeighborsClassifier(n_neighbors=3);
-#knn.fit(x,y.values.ravel())
-#print(knn.score(test, y_test))
-
 
 # para dados contínuos
 #clf = DecisionTreeRegressor(random_state=2021)
 
 # para dados não contínuos
+
 clf = DecisionTreeClassifier(random_state=2021)
 
 clf.fit(x,y)
@@ -250,23 +273,12 @@ predictions = clf.predict(x_test)
 
 predictionstest = clf.predict(test)
 
-# métricas de qualidade e avaliação do modelo
-# ------- dados contínuos -------
-# mae - measures the average magnitude of the errors (express the error in units pf the variable of interest)
-#mean_absolute_error(test,predictions)
-# mse - measure the average of squared error (squaring the error, gives high wait to large errors)
-#mean_squared_error(test,predictions)
 
-# ------- apenas para dados não continuos -------
-# accuracy
+
 # SCORE QUE TEREMOS NA SUBMISSÃO (em principio)
 pseudoScore = accuracy_score(y_test,predictionstest)
-# precision aka sensitivity - measure of exactness (determines the fraction of relevant items aomg the retrieved)
-#precision_score(y_test,predictions,average='macro')
-# recall aka specificity - measure of completeness (determines the fraction of relevant items that were obtained)
-#recall_score(y_test,predictions,average='macro')
-# true and false positives and negatives        
-#confusion_matrix(y_test,predictions)
+
+
 
 predictions = pd.DataFrame(predictions, columns=['Speed_Diff'])
 predictions.index.name='RowId'
@@ -277,3 +289,76 @@ predictionstest = pd.DataFrame(predictionstest, columns=['Speed_Diff'])
 predictionstest.index.name='RowId'
 predictionstest.index += 1 
 predictionstest.to_csv("./predictionstest.csv")
+
+
+
+# -.-.-.-.-.-.-.-.-.
+# KNN
+# -.-.-.-.-.-.-.-.-.
+
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+
+X = training.drop(['AVERAGE_SPEED_DIFF'], axis=1).drop(['city_name'],axis=1).drop(['record_date'],axis=1)
+y = training['AVERAGE_SPEED_DIFF'].to_frame()   
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.40)
+
+
+
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train = scaler.transform(X_train)
+X_test = scaler.transform(X_test)
+
+
+
+classifier = KNeighborsClassifier(n_neighbors = 8)
+classifier.fit(X_train, y_train)
+
+y_pred = classifier.predict(X_test)
+
+
+
+
+result = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:")
+print(result)
+result1 = classification_report(y_test, y_pred)
+print("Classification Report:",)
+print (result1)
+result2 = accuracy_score(y_test,y_pred)
+print("Accuracy:",result2)
+
+
+
+'''
+ métricas de qualidade e avaliação do modelo
+ 
+ ------- dados contínuos -------
+ mae - measures the average magnitude of the errors (express the error in units pf the variable of interest)
+ mean_absolute_error(test,predictions)
+ mse - measure the average of squared error (squaring the error, gives high wait to large errors)
+ mean_squared_error(test,predictions)
+ 
+ ------- apenas para dados não continuos -------
+ accuracy
+ 
+ ...............................................
+ precision aka sensitivity -> measure of exactness (determines the fraction of relevant items aomg the retrieved)
+
+ precision_score(y_test,predictions,average='macro')
+ 
+ recall aka specificity -> measure of completeness (determines the fraction of relevant items that were obtained)
+  
+ recall_score(y_test,predictions,average='macro')
+ 
+ true and false positives and negatives        
+ 
+ confusion_matrix(y_test,predictions)
+
+'''
+
