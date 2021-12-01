@@ -1,49 +1,79 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 24 11:13:29 2021
 
-@author: tiago
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Nov 22 18:46:11 2021
-
-@author: via
-"""
 import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-
-# avg_speed_diff diz nos o nivel de transito (nenhum, medio, alto, mt alto)
-# AVG_CLOUDINESS tem dados em falta
-# AVG_RAIN tem dados em falta
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+# import os
 
 
+training = pd.read_csv('training_data.csv', encoding='latin')
+test = pd.read_csv('test_data.csv', encoding='latin')
 
-#print(training.head())
+# AVERAGE_PRECIPITATION
+training.drop('AVERAGE_PRECIPITATION',axis=1, inplace=True)
+test.drop('AVERAGE_PRECIPITATION',axis=1, inplace=True)
 
-training = pd.read_csv('training_data.csv')
+#city_name
+training.drop('city_name',axis=1,inplace=True)
+test.drop('city_name',axis=1,inplace=True)
 
-  #estes prints so sao dados, depois remove-se
-   #print(training.isna().any())
-   #print(training.isna().sum()) # nr de elementos em falta
-   
-   # o parametro avg_rain ou está a NULL ou está em falta, em cada row
-   # por isso vou cortá-lo
-   # o parametro avg_precipitation esta sempre a 0, corto? up of debate porque pode nao ter chovido xD
+training.drop('AVERAGE_RAIN',axis=1,inplace=True)
+test.drop('AVERAGE_RAIN',axis=1,inplace=True)
 
-clean = training.drop('AVERAGE_RAIN',1)
-clean = clean.drop('AVERAGE_PRECIPITATION',1)
-clean = clean.fillna(method='bfill').fillna(method='ffill')
+training.drop('AVERAGE_CLOUDINESS',axis=1,inplace=True)
+test.drop('AVERAGE_CLOUDINESS',axis=1,inplace=True)
+
+training.record_date = pd.to_datetime(training.record_date)
+training['Hour'] = training.record_date.dt.hour
+
+test.record_date = pd.to_datetime(test.record_date)
+test['Hour'] = test.record_date.dt.hour
+
+training.drop('record_date',axis=1,inplace=True)
+test.drop('record_date',axis=1,inplace=True)
+
+label_encoder = LabelEncoder()
+encoded_luminosity = label_encoder.fit_transform(training[["LUMINOSITY"]])
+training["LUMINOSITY"] = encoded_luminosity
+encoded_luminosity = label_encoder.fit_transform(test[["LUMINOSITY"]])
+test["LUMINOSITY"] = encoded_luminosity
 
 
-#plt.scatter( training['AVERAGE_SPEED_DIFF'], training['AVERAGE_FREE_FLOW_SPEED'] )
+x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
+y = training['AVERAGE_SPEED_DIFF'].to_frame()
 
 
-#to be used
-"""
-X = training[['AVERAGE_FREE_FLOW_SPEED','AVERAGE_TIME_DIFF','AVERAGE_FREE_FLOW_TIME','LUMINOSITY','AVERAGE_TEMPERATURE','AVERAGE_ATMOSP_PRESSURE','AVERAGE_HUMIDITY','AVERAGE_WIND_SPEED','AVERAGE_CLOUDINESS','AVERAGE_PRECIPITATION','AVERAGE_RAIN']] 
-y= training['AVERAGE_SPEED_DIFF']
-X_train,x_test,Y_train,y_test = train_test_split(X,y,test_size=0.2)
-"""
+clf = DecisionTreeClassifier(random_state=2021)
+
+clf.fit(x,y)
+
+predictions = clf.predict(test)
+
+predictions = pd.DataFrame(predictions, columns=['Speed_Diff'])
+predictions.index.name='RowId'
+predictions.index += 1 
+predictions.to_csv("./predictionsTest.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
