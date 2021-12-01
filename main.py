@@ -22,6 +22,7 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
+import os
 
 '''
 LEITURA DO DATASET
@@ -41,14 +42,20 @@ test = test.drop('AVERAGE_PRECIPITATION',axis=1)
 training = training.drop('city_name',axis=1)
 test = test.drop('city_name',axis=1)
 
+training = training.drop('AVERAGE_RAIN',axis=1)
+test = test.drop('AVERAGE_RAIN',axis=1)
+
+training = training.drop('AVERAGE_CLOUDINESS',axis=1)
+test = test.drop('AVERAGE_CLOUDINESS',axis=1)
+
 '''
 REMOVER LINHAS ERRADAS NO DATASET
 (possivelmente nao aplicavel)
 '''
-training['record_date'] = pd.to_datetime(training['record_date'], errors='coerce')
-training['record_date'].dropna()
-test['record_date'] = pd.to_datetime(test['record_date'], errors='coerce')
-test['record_date'].dropna()
+# training['record_date'] = pd.to_datetime(training['record_date'], errors='coerce')
+# training['record_date'].dropna()
+# test['record_date'] = pd.to_datetime(test['record_date'], errors='coerce')
+# test['record_date'].dropna()
 
 
 '''
@@ -69,7 +76,7 @@ training.AVERAGE_RAIN.unique()
 '''
 LIMPEZA DE VALORES
 '''
-funcoes_auxiliares.limpa_valores(training,test)
+# funcoes_auxiliares.limpa_valores(training,test)
 
 
 '''
@@ -85,6 +92,7 @@ training["LUMINOSITY"] = encoded_luminosity
 encoded_luminosity = label_encoder.fit_transform(test[["LUMINOSITY"]])
 test["LUMINOSITY"] = encoded_luminosity
 
+'''
 encoded_cloudiness = label_encoder.fit_transform(training[["AVERAGE_CLOUDINESS"]])
 training["AVERAGE_CLOUDINESS"] = encoded_cloudiness
 encoded_cloudiness = label_encoder.fit_transform(test[["AVERAGE_CLOUDINESS"]])
@@ -94,7 +102,7 @@ encoded_rain = label_encoder.fit_transform(training[["AVERAGE_RAIN"]])
 training["AVERAGE_RAIN"] = encoded_rain
 encoded_rain = label_encoder.fit_transform(test[["AVERAGE_RAIN"]])
 test["AVERAGE_RAIN"] = encoded_rain
-
+'''
 
 '''
 # LUMINOSITY
@@ -112,8 +120,8 @@ test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].apply(funcoes_auxiliares.rainType)
 
 
 # O index (ordem) do dataSet passa a ser definido pela data 
-training.index = training['record_date']
-test.index = test['record_date']
+# training.index = training['record_date']
+# test.index = test['record_date']
 
 #  OS VALORES TEXTUAIS ESTAO TODOS EM NUMERICO NESTE PONTO #
 
@@ -124,34 +132,34 @@ test.index = test['record_date']
 
 
 # interpolação por meio da data
-dataInterpolation = training
-dataInterpolation['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'time').fillna(method='bfill')
-dataInterpolation['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'time').fillna(method='bfill')
-
-dataInterpolationTest = test
-dataInterpolationTest['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].interpolate(method = 'time').fillna(method='bfill')
-dataInterpolationTest['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'time').fillna(method='bfill')
+# dataInterpolation = training
+# dataInterpolation['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'time').fillna(method='bfill')
+# dataInterpolation['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'time').fillna(method='bfill')
+# 
+# dataInterpolationTest = test
+# dataInterpolationTest['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].interpolate(method = 'time').fillna(method='bfill')
+# dataInterpolationTest['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'time').fillna(method='bfill')
 
 
 # interpolação pelo index
-indexInterpolation = training
-indexInterpolation['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method='index').fillna(method='bfill')
-indexInterpolation['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'index').fillna(method='bfill')
-
-indexInterpolationTest = test
-indexInterpolationTest['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method='index').fillna(method='bfill')
-indexInterpolationTest['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].interpolate(method = 'index').fillna(method='bfill')
+# indexInterpolation = training
+# indexInterpolation['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method='index').fillna(method='bfill')
+# indexInterpolation['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'index').fillna(method='bfill')
+# 
+# indexInterpolationTest = test
+# indexInterpolationTest['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method='index').fillna(method='bfill')
+# indexInterpolationTest['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].interpolate(method = 'index').fillna(method='bfill')
 
 
 
 # interpolaçao linear
-linearInterpolation = training
-linearInterpolation['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
-linearInterpolation['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
+# linearInterpolation = training
+# linearInterpolation['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
+# linearInterpolation['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
 
-linearInterpolationTest = test
-linearInterpolationTest['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
-linearInterpolationTest['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
+# linearInterpolationTest = test
+# linearInterpolationTest['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].interpolate(method = 'linear').fillna(method='bfill')
+# linearInterpolationTest['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'linear').fillna(method='bfill')
 
 
 
@@ -170,8 +178,11 @@ test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].interpolate(method = 'linear').filln
 #f,ax = plt.subplots(figsize=(8,6))
 #sns.heatmap(corr_matrix,vmin=-1,vmax=1,square=True,annot=True)
 
-x = linearInterpolation.drop(['AVERAGE_SPEED_DIFF'], axis=1)
-y = linearInterpolation['AVERAGE_SPEED_DIFF'].to_frame()
+# x = linearInterpolation.drop(['AVERAGE_SPEED_DIFF'], axis=1)
+# y = linearInterpolation['AVERAGE_SPEED_DIFF'].to_frame()
+
+x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
+y = training['AVERAGE_SPEED_DIFF'].to_frame()
 x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2201)
 
 # drop de colunas textuais e datetime não suportadas pelo DecisionTree
@@ -180,9 +191,9 @@ x_train = x_train.drop('record_date',axis=1)
 x_test = x_test.drop('record_date',axis=1)
 x = x.drop('record_date',axis=1)
 test = test.drop('record_date',axis=1)
-dataInterpolationTest = dataInterpolationTest.drop('record_date',axis=1)
-indexInterpolationTest = indexInterpolationTest.drop('record_date',axis=1)
-linearInterpolationTest = linearInterpolationTest.drop('record_date',axis=1)
+# dataInterpolationTest = dataInterpolationTest.drop('record_date',axis=1)
+# indexInterpolationTest = indexInterpolationTest.drop('record_date',axis=1)
+# linearInterpolationTest = linearInterpolationTest.drop('record_date',axis=1)
 
 
 clf = DecisionTreeClassifier(random_state=2021)
@@ -214,8 +225,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
 
-X = dataInterpolation.drop(['AVERAGE_SPEED_DIFF'], axis=1).drop(['record_date'],axis=1)
-y = dataInterpolation['AVERAGE_SPEED_DIFF'].to_frame()   
+X = training.drop(['AVERAGE_SPEED_DIFF'], axis=1).drop(['record_date'],axis=1)
+y = training['AVERAGE_SPEED_DIFF'].to_frame()   
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2201)
 
