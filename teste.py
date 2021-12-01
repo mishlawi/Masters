@@ -3,7 +3,8 @@ import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 import funcoes_auxiliares as fa
-# import os
+from datetime import datetime
+import random
 
 
 training = pd.read_csv('training_data.csv', encoding='latin')
@@ -49,18 +50,14 @@ training["AVERAGE_CLOUDINESS"] = label_encoder.fit_transform(training[["AVERAGE_
 test["AVERAGE_CLOUDINESS"] = label_encoder.fit_transform(test[["AVERAGE_CLOUDINESS"]])
 training["Day_Name"] = label_encoder.fit_transform(training[["Day_Name"]])
 test["Day_Name"] = label_encoder.fit_transform(test[["Day_Name"]])
-
-encoded_luminosity = label_encoder.fit_transform(training[["LUMINOSITY"]])
-training["LUMINOSITY"] = encoded_luminosity
-encoded_luminosity = label_encoder.fit_transform(test[["LUMINOSITY"]])
-test["LUMINOSITY"] = encoded_luminosity
-
+training["LUMINOSITY"]  = label_encoder.fit_transform(training[["LUMINOSITY"]])
+test["LUMINOSITY"] = label_encoder.fit_transform(test[["LUMINOSITY"]])
 
 x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 y = training['AVERAGE_SPEED_DIFF'].to_frame()
 
-
-clf = DecisionTreeClassifier(random_state=34312)
+# 2**32 its the number max of int type
+clf = DecisionTreeClassifier(random_state=random.randrange(2**32))
 
 clf.fit(x,y)
 
@@ -69,7 +66,7 @@ predictions = clf.predict(test)
 predictions = pd.DataFrame(predictions, columns=['Speed_Diff'])
 predictions.index.name='RowId'
 predictions.index += 1 
-predictions.to_csv("./predictionsTest-1-12-21-16-30.csv")
+predictions.to_csv("./predictions"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
 
 
 
