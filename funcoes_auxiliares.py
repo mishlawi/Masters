@@ -6,19 +6,14 @@ FUNCAO DE LIMPEZA DE VALORES
 def limpa_valores(training,test):
     # AVERAGE_CLOUDINESS
     training.loc[training.AVERAGE_CLOUDINESS == 'céu claro', 'AVERAGE_CLOUDINESS'] = 'céu limpo'
-    training.loc[training.AVERAGE_CLOUDINESS == 'algumas nuvens', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
-    training.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebrados', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
-    training.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebradas', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
+    training.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebrados', 'AVERAGE_CLOUDINESS'] = 'nuvens quebradas'
     training.loc[training.AVERAGE_CLOUDINESS == 'tempo nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
     training.loc[training.AVERAGE_CLOUDINESS == 'nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
 
-    test.loc[training.AVERAGE_CLOUDINESS == 'céu claro', 'AVERAGE_CLOUDINESS'] = 'céu limpo'
-    test.loc[training.AVERAGE_CLOUDINESS == 'algumas nuvens', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
-    test.loc[training.AVERAGE_CLOUDINESS == 'nuvens dispersas', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
-    test.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebrados', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
-    test.loc[training.AVERAGE_CLOUDINESS == 'nuvens quebradas', 'AVERAGE_CLOUDINESS'] = 'céu pouco nublado'
-    test.loc[training.AVERAGE_CLOUDINESS == 'tempo nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
-    test.loc[training.AVERAGE_CLOUDINESS == 'nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
+    test.loc[test.AVERAGE_CLOUDINESS == 'céu claro', 'AVERAGE_CLOUDINESS'] = 'céu limpo'
+    test.loc[test.AVERAGE_CLOUDINESS == 'nuvens quebrados', 'AVERAGE_CLOUDINESS'] = 'nuvens quebradas'
+    test.loc[test.AVERAGE_CLOUDINESS == 'tempo nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
+    test.loc[test.AVERAGE_CLOUDINESS == 'nublado', 'AVERAGE_CLOUDINESS'] = 'céu nublado'
 
     # AVERAGE_RAIN
     training.loc[training.AVERAGE_RAIN == 'chuva leve', 'AVERAGE_RAIN'] = 'chuva fraca' 
