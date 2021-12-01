@@ -2,6 +2,7 @@
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
+import funcoes_auxiliares as fa
 # import os
 
 
@@ -32,7 +33,6 @@ training['Day_Name'] = training.record_date.dt.day_name(locale='pt')
 
 test.record_date = pd.to_datetime(test.record_date)
 test['Hour'] = test.record_date.dt.hour
-test['Hour'] = test.record_date.dt.hour
 test['Day'] = test.record_date.dt.day
 test['Month'] = test.record_date.dt.month
 test['Day_Name'] = test.record_date.dt.day_name(locale='pt')
@@ -40,8 +40,9 @@ test['Day_Name'] = test.record_date.dt.day_name(locale='pt')
 training.drop('record_date',axis=1,inplace=True)
 test.drop('record_date',axis=1,inplace=True)
 
-label_encoder = LabelEncoder()
+fa.limpa_valores(training,test)
 
+label_encoder = LabelEncoder()
 training["AVERAGE_RAIN"] = label_encoder.fit_transform(training[["AVERAGE_RAIN"]])
 test["AVERAGE_RAIN"] = label_encoder.fit_transform(test[["AVERAGE_RAIN"]])
 training["AVERAGE_CLOUDINESS"] = label_encoder.fit_transform(training[["AVERAGE_CLOUDINESS"]])
@@ -59,7 +60,7 @@ x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 y = training['AVERAGE_SPEED_DIFF'].to_frame()
 
 
-clf = DecisionTreeClassifier(random_state=2021)
+clf = DecisionTreeClassifier(random_state=34312)
 
 clf.fit(x,y)
 
@@ -68,7 +69,7 @@ predictions = clf.predict(test)
 predictions = pd.DataFrame(predictions, columns=['Speed_Diff'])
 predictions.index.name='RowId'
 predictions.index += 1 
-predictions.to_csv("./predictionsTest.csv")
+predictions.to_csv("./predictionsTest-1-12-21-16-30.csv")
 
 
 
