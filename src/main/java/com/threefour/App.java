@@ -8,8 +8,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -17,11 +17,13 @@ import com.threefour.util.Print;
 
 public class App {
 
+    // default port
     private static final int PORT = 12345;
-
-    private static List<Socket> connections = new ArrayList<>();
-    private static List<PrintWriter> outs = new ArrayList<>();
-
+    // set of socket connections to other neighbors
+    private static Set<Socket> connections = new HashSet<>();
+    // set of outputs to other neighbors
+    private static Set<PrintWriter> outs = new HashSet<>();
+    // lock of terminal output
     private static Lock sysOutLock = new ReentrantLock();
 
     // launches a thread that listens to new messages on the socket and prints
@@ -59,6 +61,8 @@ public class App {
     }
 
     public static void main(String[] args) {
+
+        System.out.println("OTT - TCP version");
 
         // connect to neighbors
         for (var ip : args) {

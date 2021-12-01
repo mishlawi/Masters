@@ -4,6 +4,9 @@ import com.diogonunes.jcolor.AnsiFormat;
 import static com.diogonunes.jcolor.Ansi.colorize;
 import static com.diogonunes.jcolor.Attribute.*;
 
+/**
+ * Class that contains methods related to the pretty printing of messages.
+ */
 public class Print {
 
     private static AnsiFormat fError = new AnsiFormat(RED_TEXT(), BOLD());
