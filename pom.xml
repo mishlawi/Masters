@@ -40,7 +40,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.threefour.App</mainClass>
+              <mainClass>com.threefour.AppUdp</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
