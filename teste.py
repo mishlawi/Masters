@@ -38,20 +38,31 @@ test['Day'] = test.record_date.dt.day
 test['Month'] = test.record_date.dt.month
 test['Day_Name'] = test.record_date.dt.day_name(locale='pt')
 
-training.drop('record_date',axis=1,inplace=True)
-test.drop('record_date',axis=1,inplace=True)
+training.drop('record_date',axis=1, inplace=True)
+test.drop('record_date',axis=1, inplace=True)
 
 fa.limpa_valores(training,test)
 
-label_encoder = LabelEncoder()
-training["AVERAGE_RAIN"] = label_encoder.fit_transform(training[["AVERAGE_RAIN"]])
-test["AVERAGE_RAIN"] = label_encoder.fit_transform(test[["AVERAGE_RAIN"]])
-training["AVERAGE_CLOUDINESS"] = label_encoder.fit_transform(training[["AVERAGE_CLOUDINESS"]])
-test["AVERAGE_CLOUDINESS"] = label_encoder.fit_transform(test[["AVERAGE_CLOUDINESS"]])
-training["Day_Name"] = label_encoder.fit_transform(training[["Day_Name"]])
-test["Day_Name"] = label_encoder.fit_transform(test[["Day_Name"]])
-training["LUMINOSITY"]  = label_encoder.fit_transform(training[["LUMINOSITY"]])
-test["LUMINOSITY"] = label_encoder.fit_transform(test[["LUMINOSITY"]])
+# AVERAGE_CLOUDINESS
+training['AVERAGE_CLOUDINESS'] = training['AVERAGE_CLOUDINESS'].apply(fa.weatherType)
+test['AVERAGE_CLOUDINESS'] = test['AVERAGE_CLOUDINESS'].apply(fa.weatherType)
+
+# AVERAGE_RAIN
+training['AVERAGE_RAIN'] = training['AVERAGE_RAIN'].apply(fa.rainType)
+test['AVERAGE_RAIN'] = test['AVERAGE_RAIN'].apply(fa.rainType)
+
+
+training["AVERAGE_RAIN"] = LabelEncoder().fit_transform(training[["AVERAGE_RAIN"]])
+test["AVERAGE_RAIN"] = LabelEncoder().fit_transform(test[["AVERAGE_RAIN"]])
+
+training["AVERAGE_CLOUDINESS"] = LabelEncoder().fit_transform(training[["AVERAGE_CLOUDINESS"]])
+test["AVERAGE_CLOUDINESS"] = LabelEncoder().fit_transform(test[["AVERAGE_CLOUDINESS"]])
+
+training["Day_Name"] = LabelEncoder().fit_transform(training[["Day_Name"]])
+test["Day_Name"] = LabelEncoder().fit_transform(test[["Day_Name"]])
+
+training["LUMINOSITY"]  = LabelEncoder().fit_transform(training[["LUMINOSITY"]])
+test["LUMINOSITY"] = LabelEncoder().fit_transform(test[["LUMINOSITY"]])
 
 x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 y = training['AVERAGE_SPEED_DIFF'].to_frame()
