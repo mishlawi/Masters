@@ -150,31 +150,35 @@ public class Client {
      */
     public static void check_pulse(){
 
-        nbReadLock.lock();
-        try{
+        while(true) {
 
-            neighbors.forEach((address,info) -> {
-
-                // if the neighbour is active
-                if(info.getKey() == true){
+            nbReadLock.lock();
+            try{
+                
+                neighbors.forEach((address,info) -> {
                     
-                    long gap = System.currentTimeMillis() - info.getValue();
-
-                    if(gap > Constants.HEARTBEAT_TIME){
-                        nbWriteLock.lock();
-                        try{neighbors.put(address,new Pair<>(false, info.getValue()));}
-                        finally{nbWriteLock.unlock();}
+                    // if the neighbour is active
+                    if(info.getKey() == true){
+                        
+                        long gap = System.currentTimeMillis() - info.getValue();
+                        
+                        if(gap > Constants.TIMEOUT){
+                            nbWriteLock.lock();
+                            try{neighbors.put(address,new Pair<>(false, info.getValue()));}
+                            finally{nbWriteLock.unlock();}
+                            Print.printInfo(address + ": Got inactivated");
+                        }
+                        
                     }
-
-                }
-
-            });
-        } finally {nbReadLock.unlock();}
-
-        try{Thread.sleep(Constants.HEARTBEAT_TIME);}
-        catch(Exception e)
-        {
-            Print.printError("Could not fall asleep: " + e.getMessage());
+                    
+                });
+            } finally {nbReadLock.unlock();}
+            
+            try{Thread.sleep(Constants.TIMEOUT);}
+            catch(Exception e)
+            {
+                Print.printError("Could not fall asleep: " + e.getMessage());
+            }
         }
         
     }
