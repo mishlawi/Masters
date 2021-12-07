@@ -4,6 +4,7 @@ import java.util.Objects;
 
 /**
  * Class that defines a pair.
+ * 
  * @param <K> Key.
  * @param <V> Value.
  */
@@ -12,10 +13,10 @@ public class Pair<K, V> {
     private final K key;
     private V value;
 
-
     /**
      * Constructor.
-     * @param key Pair's key.
+     * 
+     * @param key   Pair's key.
      * @param value Pair's value.
      */
     public Pair(K key, V value) {
@@ -25,6 +26,7 @@ public class Pair<K, V> {
 
     /**
      * Returns pair's key.
+     * 
      * @return Pair's key.
      */
     public K getKey() {
@@ -33,6 +35,7 @@ public class Pair<K, V> {
 
     /**
      * Returns pair's value.
+     * 
      * @return Pair's value.
      */
     public V getValue() {
@@ -41,6 +44,7 @@ public class Pair<K, V> {
 
     /**
      * Changes pair's value.
+     * 
      * @param value New pair's value.
      * @return Old pair's value.
      */
@@ -58,7 +62,7 @@ public class Pair<K, V> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final Pair<?,?> other = (Pair<?,?>) obj;
+        final Pair<?, ?> other = (Pair<?, ?>) obj;
         return this.key.equals(other.key) && this.value.equals(other.value);
     }
 
@@ -66,5 +70,5 @@ public class Pair<K, V> {
     public int hashCode() {
         return Objects.hashCode(key.toString() + value.toString());
     }
-    
+
 }
