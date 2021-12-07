@@ -12,22 +12,29 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.threefour.util.Print;
+import com.threefour.util.Pair;
 import com.threefour.Message.Type;
 
 public class Client {
 
     // client's socket
     private static DatagramSocket socket = null;
-    // map with neighbors' adresses and timestamp
-    private static Map<InetAddress, Long> neighbors = new HashMap<>();
-    // neighbors' map lock 
-    private static Lock nbLock = new ReentrantLock();
+    // map with neighbors' adresses, state and timestamp
+    private static Map<InetAddress, Pair<Boolean,Long>> neighbors = new HashMap<>();
+
+    // neighbors' map locks
+    private static ReadWriteLock nbReadWriteLock = new ReentrantReadWriteLock();
+    private static Lock nbWriteLock = nbReadWriteLock.writeLock();
+    private static Lock nbReadLock = nbReadWriteLock.writeLock();
 
     // lock of the standard output
     private static Lock sysoutLock = new ReentrantLock();
+
 
     /**
      * Adds a neighbour to a client.
@@ -35,12 +42,13 @@ public class Client {
     */
     private static void add_neighbour(InetAddress address) {
 
-        nbLock.lock();
+        nbWriteLock.lock();
         try {
-            neighbors.put(address,0L);
-        }finally {nbLock.unlock();}
+            neighbors.put(address,new Pair<>(false, 0L));
+        }finally {nbWriteLock.unlock();}
 
     }
+
 
     /**
      * Listens to socket messages.
@@ -68,7 +76,11 @@ public class Client {
                 // update neighbour's timestamp if it's an heartbeat
                 if (message.type.equals(Type.HEARTBEAT)) {
 
-                    neighbors.put(packet.getAddress(),System.currentTimeMillis());
+                    nbWriteLock.lock();
+                    try{
+                        neighbors.put(packet.getAddress(),new Pair<>(true,System.currentTimeMillis()));
+                    } finally{nbWriteLock.unlock();}
+
                     System.out.println("Received a heartbeat from: " + packet.getAddress());
 
                 }
@@ -95,6 +107,7 @@ public class Client {
 
     }
 
+
     /**
      * This thread sends a heartbeat every Constant.HEARTBEAT_TIME miliseconds to every single neighbour.
      */
@@ -108,14 +121,17 @@ public class Client {
 
             while(socket != null)
             {
-                neighbors.forEach((address,timestamp) -> {
-                    packet.setAddress(address);
-                    try {
-                        socket.send(packet);
-                    } catch (IOException e) {
-                        Print.printError("Could not send packet: " + e.getMessage());
-                    }
-                });
+                nbReadLock.lock();
+                try{
+                    neighbors.forEach((address,info) -> {
+                        packet.setAddress(address);
+                        try {
+                            socket.send(packet);
+                        } catch (IOException e) {
+                            Print.printError("Could not send packet: " + e.getMessage());
+                        }
+                    });
+                } finally {nbReadLock.unlock();}
 
                 Thread.sleep(Constants.HEARTBEAT_TIME);
 
@@ -126,6 +142,41 @@ public class Client {
             Print.printError("Could not send packet: " + e.getMessage());
         }
 
+    }
+
+
+    /**
+     * Check neighbour's state.
+     */
+    public static void check_pulse(){
+
+        nbReadLock.lock();
+        try{
+
+            neighbors.forEach((address,info) -> {
+
+                // if the neighbour is active
+                if(info.getKey() == true){
+                    
+                    long gap = System.currentTimeMillis() - info.getValue();
+
+                    if(gap > Constants.HEARTBEAT_TIME){
+                        nbWriteLock.lock();
+                        try{neighbors.put(address,new Pair<>(false, info.getValue()));}
+                        finally{nbWriteLock.unlock();}
+                    }
+
+                }
+
+            });
+        } finally {nbReadLock.unlock();}
+
+        try{Thread.sleep(Constants.HEARTBEAT_TIME);}
+        catch(Exception e)
+        {
+            Print.printError("Could not fall asleep: " + e.getMessage());
+        }
+        
     }
 
     public static void main(String[] args) {
@@ -154,6 +205,9 @@ public class Client {
         // send heartbeats
         new Thread(() -> {heartbeat();}).start();
 
+        // check neighbour's pulse
+        new Thread(() -> {check_pulse();}).start();
+
         // read user input and send messages
         var reader = new BufferedReader(new InputStreamReader(System.in));
         String line;
@@ -166,15 +220,18 @@ public class Client {
                 var packet = new DatagramPacket(userInput, userInput.length);
                 packet.setPort(Constants.PORT);
 
-                neighbors.forEach((address,timestamp) -> {
-                    packet.setAddress(address);
-                    try {
-                        socket.send(packet);
-                    } catch (IOException e) {
-                        Print.printError("Could not send packet: " + e.getMessage());
-                    }
-                });
-
+                nbReadLock.lock();
+                try{
+                    neighbors.forEach((address,info) -> {
+                        packet.setAddress(address);
+                        try {
+                            socket.send(packet);
+                        } catch (IOException e) {
+                            Print.printError("Could not send packet: " + e.getMessage());
+                        }
+                    });
+                } finally{nbReadLock.unlock();}
+                
             }
         } catch (IOException e) {
             Print.printError("Could not read user input: " + e.getMessage());
@@ -183,5 +240,3 @@ public class Client {
     }
 
 }
-
-
