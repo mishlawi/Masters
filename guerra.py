@@ -72,8 +72,6 @@ test["LUMINOSITY"] = LabelEncoder().fit_transform(test[["LUMINOSITY"]])
 x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 y = training['AVERAGE_SPEED_DIFF'].to_frame()
 
-# 2**32 its the number max of int type
-#clf = DecisionTreeClassifier(random_state=random.randrange(2**32))
 rf_model = RandomForestClassifier(random_state=95)
 rf_model.fit(x, y)
 
@@ -86,7 +84,7 @@ rf_predictions = rf_model.predict(test)
 rf_predictions = pd.DataFrame(rf_predictions, columns=['Speed_Diff'])
 rf_predictions.index.name='RowId'
 rf_predictions.index += 1 
-rf_predictions.to_csv("./predictions"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
+rf_predictions.to_csv("./predictions/predictionsGuerra"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
 
 
 

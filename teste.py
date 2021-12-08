@@ -67,8 +67,7 @@ test["LUMINOSITY"] = LabelEncoder().fit_transform(test[["LUMINOSITY"]])
 x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 y = training['AVERAGE_SPEED_DIFF'].to_frame()
 
-# 2**32 its the number max of int type
-clf = DecisionTreeClassifier(random_state=random.randrange(2**32))
+clf = DecisionTreeClassifier(random_state=2021)
 
 clf.fit(x,y)
 
@@ -77,7 +76,7 @@ predictions = clf.predict(test)
 predictions = pd.DataFrame(predictions, columns=['Speed_Diff'])
 predictions.index.name='RowId'
 predictions.index += 1 
-predictions.to_csv("./predictions"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
+predictions.to_csv("./predictions/predictionsTeste"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
 
 
 
