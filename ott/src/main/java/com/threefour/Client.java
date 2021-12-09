@@ -18,7 +18,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.threefour.util.Print;
 import com.threefour.util.Pair;
-import com.threefour.Message.Type;
+import com.threefour.message.Message;
+import com.threefour.message.Type;
 
 public class Client {
 
