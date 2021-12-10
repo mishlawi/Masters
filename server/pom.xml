@@ -45,7 +45,7 @@
               <configuration>
                 <archive>
                   <manifest>
-                    <mainClass>com.threefour.App</mainClass>
+                    <mainClass>com.threefour.server.Server</mainClass>
                   </manifest>
                 </archive>
                 <descriptorRefs>
