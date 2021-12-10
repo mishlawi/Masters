@@ -14,7 +14,9 @@ public record Announcement(byte distance, InetAddress server) {
         var out = new DataOutputStream(byteStream);
 
         out.writeByte(distance);
-        out.write(server.getAddress());
+        if (server != null) {
+            out.write(server.getAddress());
+        }
 
         return byteStream.toByteArray();
     }
@@ -23,7 +25,12 @@ public record Announcement(byte distance, InetAddress server) {
         var in = new DataInputStream(new ByteArrayInputStream(data));
 
         var distance = in.readByte();
-        var server = InetAddress.getByAddress(in.readAllBytes());
+
+        InetAddress server = null;
+        var addr = in.readAllBytes();
+        if (addr.length > 0) {
+            server = InetAddress.getByAddress(addr);
+        }
 
         return new Announcement(distance, server);
     }
