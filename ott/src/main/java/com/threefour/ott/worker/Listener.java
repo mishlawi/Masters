@@ -117,7 +117,7 @@ public class Listener implements Runnable {
             announcement = new Announcement((byte) 0, address);
         }
 
-        Print.printInfo("Got announcement: " + announcement);
+        Print.printInfo(address + ": " + announcement);
 
         // if this is the first announcement
         if (this.routeTable == null) {

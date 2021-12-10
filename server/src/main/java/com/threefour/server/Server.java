@@ -14,6 +14,8 @@ import com.threefour.util.Print;
 public class Server {
     public static void main(String[] args) {
 
+        System.out.println("Running server...");
+
         Set<InetAddress> neighbors = new HashSet<>();
         DatagramSocket socket = null;
 

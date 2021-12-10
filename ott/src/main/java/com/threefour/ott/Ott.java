@@ -36,7 +36,7 @@ public class Ott {
 
     public static void main(String[] args) {
 
-        System.out.println("OTT - Structured version");
+        System.out.println("Running OTT...");
 
         // parse the addresses of neighbors
         for (var ip : args) {
