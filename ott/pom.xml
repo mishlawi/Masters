@@ -45,7 +45,7 @@
               <configuration>
                 <archive>
                   <manifest>
-                    <mainClass>com.threefour.Client</mainClass>
+                    <mainClass>com.threefour.ott.Ott</mainClass>
                   </manifest>
                 </archive>
                 <descriptorRefs>
