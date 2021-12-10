@@ -17,6 +17,13 @@ public class Message {
     // Payload length of the Message
     public final int payload_length;
 
+    // Static messages
+    public static final Message MSG_HEARTBEAT = new Message(Type.HEARTBEAT, null);
+    public static final Message MSG_RT_ADD = new Message(Type.RT_ADD, null);
+    public static final Message MSG_RT_DELETE = new Message(Type.RT_DELETE, null);
+    public static final Message MSG_RT_ACTIVATE = new Message(Type.RT_ACTIVATE, null);
+    public static final Message MSG_RT_DEACTIVATE = new Message(Type.RT_DEACTIVATE, null);
+
     /**
      * Constructor for a Message of type HEARTBEAT.
      */
