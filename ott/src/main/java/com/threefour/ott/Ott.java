@@ -58,7 +58,8 @@ public class Ott {
         try {
             socket = new DatagramSocket(Constants.PORT);
         } catch (SocketException e) {
-            System.out.println("Socket error: " + e.getMessage());
+            Print.printError("Socket error: " + e.getMessage());
+            System.exit(1);
         }
 
         // launch thread to listen to messages
@@ -67,7 +68,7 @@ public class Ott {
         // launch thread to send periodic heartbeats
         new Thread(new PulseSender(socket, neighbors, nbReadLock)).start();
 
-        // launch thread to manage neighbors' pulse
+        // launch thread to manage neighbors' pulses
         new Thread(new PulseChecker(neighbors, nbReadWriteLock)).start();
 
         // read user input and send messages
