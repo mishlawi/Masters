@@ -12,4 +12,7 @@ public class Constants {
     // neighbours' timeout (ms)
     public static final long TIMEOUT = HEARTBEAT_TIME * 4;
 
+    // time gap between announcements (ms)
+    public static final long ANNOUNCE_TIME = 10000L;
+
 }
