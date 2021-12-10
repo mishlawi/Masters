@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 
 public class Message {
 
+    // TODO: add version
     // Message's type
     public final Type type;
     // Message's payload
@@ -49,7 +50,12 @@ public class Message {
      * @throws IOException
      */
     public void serialize(DataOutputStream out) throws IOException {
+        if (payload_length > 65535) {
+            throw new IOException("Message exceeds maximum size of 65535: Has " + payload_length);
+        }
+
         this.type.serialize(out);
+
         byte[] payload_length_bytes = ByteBuffer.allocate(4).putInt(payload_length).array();
         out.writeByte(payload_length_bytes[2]);
         out.writeByte(payload_length_bytes[3]);
