@@ -9,6 +9,15 @@ import java.net.InetAddress;
 
 public record Announcement(byte distance, InetAddress server) {
 
+    /**
+     * Adds one to distance count.
+     * 
+     * @return New annoucement with updated distance.
+     */
+    public Announcement increment() {
+        return new Announcement((byte) (distance + 1), server);
+    }
+
     public byte[] toBytes() throws IOException {
         var byteStream = new ByteArrayOutputStream();
         var out = new DataOutputStream(byteStream);
