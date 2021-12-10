@@ -6,41 +6,23 @@ import java.io.IOException;
 
 /**
  * Type of Message.
- * 
- * 0b 0000 0001: Heartbeat
- * 0b 0000 0010: User input
  */
-public class Type {
+public enum Type {
 
-    public static final Type HEARTBEAT = new Type((byte) 1);
-    public static final Type USER_INPUT = new Type((byte) 2);
+    // general types
+    HEARTBEAT,
+    USER_INPUT,
+    ANNOUNCEMENT,
+    DATA,
 
-    /**
-     * Type's id.
-     */
-    private byte id;
+    // route related types
+    RT_ADD,
+    RT_DELETE,
+    RT_ACTIVATE,
+    RT_DEACTIVATE;
 
-    /**
-     * Constructor for the Type.
-     * 
-     * @param id Type's id.
-     */
-    private Type(byte id) {
-        this.id = id;
-    }
-
-    /**
-     * Size, in bytes, of a Type.
-     * 
-     * @return Size of a Type.
-     */
-    int size() {
-        return Byte.SIZE;
-    }
-
-    public boolean equals(Type t) {
-        return t.id == this.id;
-    }
+    // array of all possible type values (indexed by the .ordinal() value)
+    private static final Type[] types = Type.values();
 
     /**
      * Transfoms a Type into bytes and writes them into an output stream.
@@ -49,7 +31,8 @@ public class Type {
      * @throws IOException
      */
     void serialize(DataOutputStream out) throws IOException {
-        out.writeByte(this.id);
+        // TODO: check if this is 100% correct
+        out.writeByte(this.ordinal());
     }
 
     /**
@@ -61,7 +44,7 @@ public class Type {
      */
     static Type unserialize(DataInputStream in) throws IOException {
         byte id = in.readByte();
-
-        return new Type(id);
+        return types[id];
     }
+
 }
