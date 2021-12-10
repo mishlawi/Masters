@@ -1,4 +1,4 @@
-package com.threefour;
+package com.threefour.client;
 
 /**
  * Hello world!
