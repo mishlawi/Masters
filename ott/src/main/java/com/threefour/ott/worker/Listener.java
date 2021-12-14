@@ -110,9 +110,9 @@ public class Listener implements Runnable {
      */
     private void announcement(InetAddress address, Announcement announcement) {
 
-        // if the announcement comes directly from the server, its address
-        // to be instantiated (because it starts at null, since the server
-        // doesn't put its own address in the announcement)
+        // if the announcement comes directly from the server, its address 
+        // needs to be instantiated (because it starts at null, since the 
+        // server doesn't put its own address in the announcement)
         if (announcement.distance() == 0) {
             announcement = new Announcement((byte) 0, address);
         }
