@@ -1,4 +1,4 @@
-package com.threefour;
+package com.threefour.message;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,73 +9,20 @@ import java.nio.ByteBuffer;
 
 public class Message {
 
-    /**
-     * Type of Message.
-     * 
-     * 0b 0000 0001: Heartbeat
-     * 0b 0000 0010: User input
-     */
-    public static class Type {
-        public static final Type HEARTBEAT = new Type((byte) 1);
-        public static final Type USER_INPUT = new Type((byte) 2);
-
-        /**
-         * Type's id.
-         */
-        private byte id;
-
-        /**
-         * Constructor for the Type.
-         * 
-         * @param id Type's id.
-         */
-        private Type(byte id) {
-            this.id = id;
-        }
-
-        /**
-         * Size, in bytes, of a Type.
-         * 
-         * @return Size of a Type.
-         */
-        int size() {
-            return Byte.SIZE;
-        }
-
-        public boolean equals(Type t) {
-            return t.id == this.id;
-        }
-
-        /**
-         * Transfoms a Type into bytes and writes them into an output stream.
-         * 
-         * @param out Output stream to store bytes of Type.
-         * @throws IOException
-         */
-        void serialize(DataOutputStream out) throws IOException {
-            out.writeByte(this.id);
-        }
-
-        /**
-         * Reads bytes from an input stream and transforms them into a Type.
-         * 
-         * @param in Input stream to read from.
-         * @return New instance of a Type.
-         * @throws IOException
-         */
-        static Type unserialize(DataInputStream in) throws IOException {
-            byte id = in.readByte();
-
-            return new Type(id);
-        }
-    }
-
+    // TODO: add version
     // Message's type
     public final Type type;
     // Message's payload
     public final byte[] payload;
     // Payload length of the Message
     public final int payload_length;
+
+    // Static messages
+    public static final Message MSG_HEARTBEAT = new Message(Type.HEARTBEAT, null);
+    public static final Message MSG_RT_ADD = new Message(Type.RT_ADD, null);
+    public static final Message MSG_RT_DELETE = new Message(Type.RT_DELETE, null);
+    public static final Message MSG_RT_ACTIVATE = new Message(Type.RT_ACTIVATE, null);
+    public static final Message MSG_RT_DEACTIVATE = new Message(Type.RT_DEACTIVATE, null);
 
     /**
      * Constructor for a Message of type HEARTBEAT.
@@ -110,7 +57,12 @@ public class Message {
      * @throws IOException
      */
     public void serialize(DataOutputStream out) throws IOException {
+        if (payload_length > 65535) {
+            throw new IOException("Message exceeds maximum size of 65535: Has " + payload_length);
+        }
+
         this.type.serialize(out);
+
         byte[] payload_length_bytes = ByteBuffer.allocate(4).putInt(payload_length).array();
         out.writeByte(payload_length_bytes[2]);
         out.writeByte(payload_length_bytes[3]);
