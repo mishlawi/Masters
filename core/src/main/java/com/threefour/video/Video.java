@@ -9,9 +9,17 @@ public class Video {
     FileInputStream fis;
     int frameNum;
 
+    // TODO might be better to not have this hardcoded
+    public final int framePeriod = 100;
+    public final int videoLength = 500;
+
     public Video(String filename) throws FileNotFoundException {
         this.fis = new FileInputStream(filename);
         this.frameNum = 0;
+    }
+
+    public boolean hasEnded() {
+        return frameNum == videoLength;
     }
 
     public Frame getNextFrame() throws IOException {
@@ -24,7 +32,7 @@ public class Video {
         var frameBytes = new byte[frameSize];
         fis.read(frameBytes, 0, frameSize);
 
-        return new Frame(frameNum, frameBytes);
+        return new Frame(frameNum++, frameBytes);
     }
 
 }
