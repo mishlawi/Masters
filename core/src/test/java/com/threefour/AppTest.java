@@ -5,8 +5,10 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Arrays;
 
 import com.threefour.message.Announcement;
+import com.threefour.video.Frame;
 
 import org.junit.Test;
 
@@ -30,6 +32,19 @@ public class AppTest {
             var before = new Announcement((byte) 10, null);
             var after = Announcement.fromBytes(before.toBytes());
             assertTrue("Announcement is different after serialization", before.equals(after));
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Exception thrown");
+        }
+    }
+
+    @Test
+    public void frameIsTheSameAfterSerialization() {
+        try {
+            var before = new Frame(10, new byte[] { 13, 42 });
+            var after = Frame.fromBytes(before.toBytes());
+            assertTrue("Frame is different after serialization",
+                    before.frameNum() == after.frameNum() && Arrays.equals(before.data(), after.data()));
         } catch (IOException e) {
             e.printStackTrace();
             fail("Exception thrown");
