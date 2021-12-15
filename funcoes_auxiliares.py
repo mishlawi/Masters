@@ -63,6 +63,18 @@ def rainType(chuva):
     elif( chuva == 'trovoada com chuva' ):        
         return 7
 
+def speedToNumber(speed):
+    if ( speed == 'None' ):
+        return 0
+    elif ( speed == 'Low' ):
+        return 1
+    elif ( speed == 'Medium' ):
+        return 2
+    elif ( speed == 'High' ):
+        return 3
+    elif speed == 'Very High':
+        return 4
+
 def roundInt(num):
     return int(round(num,0))
 

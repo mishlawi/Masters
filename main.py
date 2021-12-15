@@ -223,24 +223,66 @@ funcoes_auxiliares.predictions_to_csv(pred=predictionstest,filename="predictions
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import MinMaxScaler
 
 
-X = training.drop(['AVERAGE_SPEED_DIFF'], axis=1).drop(['record_date'],axis=1)
-y = training['AVERAGE_SPEED_DIFF'].to_frame()   
+training = pd.read_csv('training_data.csv', encoding='latin')
+test = pd.read_csv('test_data.csv', encoding='latin')
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2201)
+# AVERAGE_PRECIPITATION
+training.drop('AVERAGE_PRECIPITATION',axis=1, inplace=True)
+test.drop('AVERAGE_PRECIPITATION',axis=1, inplace=True)
+
+#city_name
+training.drop('city_name',axis=1,inplace=True)
+test.drop('city_name',axis=1,inplace=True)
+
+training.record_date = pd.to_datetime(training.record_date)
+training['Hour'] = training.record_date.dt.hour
+training['Day'] = training.record_date.dt.day
+training['Month'] = training.record_date.dt.month
+training['Day_Name'] = training.record_date.dt.day_name(locale='pt')
+
+test.record_date = pd.to_datetime(test.record_date)
+test['Hour'] = test.record_date.dt.hour
+test['Day'] = test.record_date.dt.day
+test['Month'] = test.record_date.dt.month
+test['Day_Name'] = test.record_date.dt.day_name(locale='pt')
+
+
+training.drop('record_date',axis=1, inplace=True)
+test.drop('record_date',axis=1, inplace=True)
+
+
+training.drop('AVERAGE_CLOUDINESS',axis=1, inplace=True)
+test.drop('AVERAGE_CLOUDINESS',axis=1, inplace=True)
+
+training.drop('AVERAGE_RAIN',axis=1,inplace=True)
+test.drop('AVERAGE_RAIN',axis=1,inplace=True)
+
+
+training["Day_Name"] = LabelEncoder().fit_transform(training[["Day_Name"]])
+test["Day_Name"] = LabelEncoder().fit_transform(test[["Day_Name"]])
+
+training["LUMINOSITY"]  = LabelEncoder().fit_transform(training[["LUMINOSITY"]])
+test["LUMINOSITY"] = LabelEncoder().fit_transform(test[["LUMINOSITY"]])
+
+
+X_train = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
+X_test = test
+y_train = training['AVERAGE_SPEED_DIFF'].to_frame()
 
 
 
-scaler = StandardScaler()
-scaler.fit(X_train)
-X_train = scaler.transform(X_train)
-X_test = scaler.transform(X_test)
-test = scaler.transform(test)
+scaler_X = MinMaxScaler(feature_range=(0, 1)).fit(X_train)
+scaler_test = MinMaxScaler(feature_range=(0, 1)).fit(X_test)
+
+X_train = pd.DataFrame(scaler_X.transform(X_train[X_train.columns]), columns=X_train.columns)
+X_test = pd.DataFrame(scaler_test.transform(X_test[X_test.columns]), columns=X_test.columns)
 
 
 
-classifier = KNeighborsClassifier(n_neighbors = 8)
+classifier = KNeighborsClassifier(n_neighbors = 10, algorithm='brute')
 classifier.fit(X_train, y_train)
 
 y_pred = classifier.predict(test)
