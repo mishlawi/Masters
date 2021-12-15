@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.threefour.Constants;
 import com.threefour.server.worker.Announcer;
+import com.threefour.server.worker.Streamer;
 import com.threefour.util.Print;
 
 public class Server {
@@ -19,13 +20,21 @@ public class Server {
         Set<InetAddress> neighbors = new HashSet<>();
         DatagramSocket socket = null;
 
-        // parse the addresses of neighbors
-        for (var ip : args) {
-            try {
-                var address = InetAddress.getByName(ip);
-                neighbors.add(address);
-            } catch (UnknownHostException e) {
-                Print.printError("Parsed unknown host " + ip + ": " + e.getMessage());
+        String filename = null;
+
+        // parse arguments
+        for (var arg : args) {
+            if (filename == null) {
+                // parse video filename
+                filename = arg;
+            } else {
+                // parse neighbors
+                try {
+                    var address = InetAddress.getByName(arg);
+                    neighbors.add(address);
+                } catch (UnknownHostException e) {
+                    Print.printError("Parsed unknown host " + arg + ": " + e.getMessage());
+                }
             }
         }
 
@@ -37,10 +46,10 @@ public class Server {
             System.exit(1);
         }
 
-        // launch thread to send periodic info (currently main thread)
-        new Announcer(socket, neighbors).run();
-
-        // launch thread to send frames
-        // later
+        // launch thread to send periodic info
+        new Thread(new Announcer(socket, neighbors)).start();
+        
+        // send frames
+        new Streamer(socket, neighbors, filename).run();
     }
 }
