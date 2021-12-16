@@ -13,15 +13,6 @@ from datetime import datetime
 import random
 
 
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import StratifiedKFold
-
-
-
-
-
-
-
 
 training = pd.read_csv('training_data.csv', encoding='latin')
 test = pd.read_csv('test_data.csv', encoding='latin')
@@ -70,46 +61,10 @@ x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 
 
 
-
-#xgbr_model.fit(x, y)
-
-
+xgbr_model = XGBClassifier(n_estimators = 120, learning_rate=0.1, criterion='friedman_mse',max_depth=5)
+xgbr_model.fit(x, y)
 
 
-model = XGBClassifier()
-n_estimators = [120,150,180]
-learning_rate = [0.1]
-criterion = ['friedman_mse']
-max_depth = [5]
-param_grid = dict(n_estimators=n_estimators,learning_rate=learning_rate,criterion=criterion,max_depth=max_depth)
-kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=7)
-grid_search = GridSearchCV(model, param_grid, scoring="neg_log_loss", n_jobs=-1, cv=kfold)
-grid_result = grid_search.fit(x, y)
-# summarize results
-print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
-means = grid_result.cv_results_['mean_test_score']
-stds = grid_result.cv_results_['std_test_score']
-params = grid_result.cv_results_['params']
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
 xgbr_predictions = xgbr_model.predict(test)
 
 
@@ -117,9 +72,5 @@ xgbr_predictions = pd.DataFrame(xgbr_predictions, columns=['Speed_Diff'])
 xgbr_predictions.index.name='RowId'
 xgbr_predictions.index += 1 
 xgbr_predictions.to_csv("./predictions/predictionsXGB"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
-"""
-
-
-
 
 
