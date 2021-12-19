@@ -12,7 +12,7 @@ public class RouteTable {
     public int distance;
 
     // map of child nodes + route state
-    private Map<InetAddress, Boolean> routes = new HashMap<>();
+    public Map<InetAddress, Boolean> routes = new HashMap<>();
 
     public RouteTable(InetAddress server, InetAddress parent, int distance) {
         this.server = server;

@@ -110,8 +110,8 @@ public class Listener implements Runnable {
      */
     private void announcement(InetAddress address, Announcement announcement) {
 
-        // if the announcement comes directly from the server, its address 
-        // needs to be instantiated (because it starts at null, since the 
+        // if the announcement comes directly from the server, its address
+        // needs to be instantiated (because it starts at null, since the
         // server doesn't put its own address in the announcement)
         if (announcement.distance() == 0) {
             announcement = new Announcement((byte) 0, address);
@@ -128,8 +128,6 @@ public class Listener implements Runnable {
                 // send RT_ADD to parent
                 sendMessage(address, Message.MSG_RT_ADD);
                 Print.printInfo(address + " is the first parent");
-                // propagate announcement to other neighbors with +1 distance
-                floodMessage(new Message(Type.ANNOUNCEMENT, announcement.increment().toBytes()));
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -158,15 +156,16 @@ public class Listener implements Runnable {
                 this.routeTable.distance = announcement.distance();
             }
 
-            try {
-                // propagate announcement to other neighbors with +1 distance
-                floodMessage(new Message(Type.ANNOUNCEMENT, announcement.increment().toBytes()));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
         }
-        // if not any of the above, do nothing
+
+        // propagate announcement to other neighbors with +1 distance
+        try {
+            floodMessage(new Message(Type.ANNOUNCEMENT, announcement.increment().toBytes()));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+
+        }
     }
 
     /**
@@ -188,6 +187,124 @@ public class Listener implements Runnable {
     private void routeAdd(InetAddress address) {
         this.routeTable.addRoute(address);
         Print.printInfo("Established route to " + address);
+    }
+
+    /**
+     * Processes a route activation message.
+     * 
+     * @param address Address of the sender.
+     */
+    private void activate(InetAddress address) {
+
+        if (this.routeTable != null) {
+
+            // activate child's route
+            this.routeTable.activateRoute(address);
+            Print.printInfo("Route to " + address + " activated");
+
+            try {
+                // sends activation message to parent
+                sendMessage(this.routeTable.parent, Message.MSG_RT_ACTIVATE);
+                Print.printInfo("Sent activation message to " + this.routeTable.parent);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    /**
+     * Processes a route deactivation message.
+     * 
+     * @param address Address of the sender.
+     */
+    private void deactivate(InetAddress address) {
+
+        if (this.routeTable != null) {
+
+            // deactivate child's route
+            this.routeTable.deactivateRoute(address);
+            Print.printInfo("Route to " + address + " deactivated");
+
+            try {
+                // sends deactivation message to parent
+                sendMessage(this.routeTable.parent, Message.MSG_RT_DEACTIVATE);
+                Print.printInfo("Sent deactivation message to " + this.routeTable.parent);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    /**
+     * Processes a route deletion message.
+     * 
+     * @param address Address of the sender.
+     */
+    private void delete(InetAddress address) {
+
+        if (this.routeTable != null) {
+            // delete child's route
+            this.routeTable.deleteRoute(address);
+            Print.printInfo("Route to " + address + " deleted");
+        }
+
+    }
+
+    /**
+     * Processes a route loss message.
+     */
+    private void lost() {
+
+        if (this.routeTable != null) {
+
+            try {
+
+                // send lost message to children
+                for (InetAddress address : this.routeTable.routes.keySet()) {
+                    sendMessage(address, Message.MSG_RT_LOST);
+                    Print.printInfo("Sent lost message to " + this.routeTable.parent);
+                }
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            // delete route table
+            routeTable = null;
+
+        }
+
+    }
+
+    /**
+     * Processes a data message.
+     */
+    private void data(Message message) {
+
+        if (this.routeTable != null) {
+
+            try {
+
+                // send data to children
+                for (InetAddress address : this.routeTable.routes.keySet()) {
+                    sendMessage(address, message);
+                    Print.printInfo("Sent data message to " + this.routeTable.parent);
+                }
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
     // --------------------
@@ -225,19 +342,22 @@ public class Listener implements Runnable {
                         announcement(address, Announcement.fromBytes(message.payload));
                         break;
                     case DATA:
-                        // TODO: on step 4
+                        data(message);
                         break;
                     case RT_ADD:
                         routeAdd(address);
                         break;
                     case RT_DELETE:
-                        // TODO
+                        delete(address);
                         break;
                     case RT_ACTIVATE:
-                        // TODO
+                        activate(address);
                         break;
                     case RT_DEACTIVATE:
-                        // TODO
+                        deactivate(address);
+                        break;
+                    case RT_LOST:
+                        lost();
                         break;
                     default:
                         Print.printError("Unhandled message type in Listener: " + message.type.name());

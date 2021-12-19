@@ -23,6 +23,7 @@ public class Message {
     public static final Message MSG_RT_DELETE = new Message(Type.RT_DELETE, null);
     public static final Message MSG_RT_ACTIVATE = new Message(Type.RT_ACTIVATE, null);
     public static final Message MSG_RT_DEACTIVATE = new Message(Type.RT_DEACTIVATE, null);
+    public static final Message MSG_RT_LOST = new Message(Type.RT_LOST, null);
 
     /**
      * Constructor for a Message of type HEARTBEAT.
