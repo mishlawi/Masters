@@ -3,22 +3,21 @@ package com.threefour.server.worker;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.util.Set;
 
 import com.threefour.Constants;
 import com.threefour.message.Announcement;
 import com.threefour.message.Message;
 import com.threefour.message.Type;
+import com.threefour.overlay.Neighbours;
 
 public class Announcer implements Runnable {
 
     private DatagramSocket socket;
-    private Set<InetAddress> neighbors;
+    private Neighbours neighbours;
 
-    public Announcer(DatagramSocket socket, Set<InetAddress> neighbors) {
+    public Announcer(DatagramSocket socket, Neighbours neighbours) {
         this.socket = socket;
-        this.neighbors = neighbors;
+        this.neighbours = neighbours;
     }
 
     @Override
@@ -30,7 +29,9 @@ public class Announcer implements Runnable {
 
             while (true) {
 
-                for (var neighbor : neighbors) {
+                var addresses = neighbours.getActiveAdresses();
+
+                for (var neighbor : addresses) {
                     packet.setAddress(neighbor);
                     socket.send(packet);
                 }

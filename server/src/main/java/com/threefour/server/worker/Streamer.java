@@ -4,12 +4,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.util.Set;
 
 import com.threefour.Constants;
 import com.threefour.message.Message;
 import com.threefour.message.Type;
+import com.threefour.overlay.Neighbours;
 import com.threefour.util.Print;
 import com.threefour.video.Frame;
 import com.threefour.video.Video;
@@ -17,13 +16,13 @@ import com.threefour.video.Video;
 public class Streamer implements Runnable {
 
     private DatagramSocket socket;
-    private Set<InetAddress> neighbors;
+    private Neighbours neighbours;
 
     private String filename;
 
-    public Streamer(DatagramSocket socket, Set<InetAddress> neighbors, String filename) {
+    public Streamer(DatagramSocket socket, Neighbours neighbours, String filename) {
         this.socket = socket;
-        this.neighbors = neighbors;
+        this.neighbours = neighbours;
         this.filename = filename;
     }
 
@@ -57,7 +56,9 @@ public class Streamer implements Runnable {
                 var packet = new DatagramPacket(message, message.length);
                 packet.setPort(Constants.PORT);
 
-                for (var addr : neighbors) {
+                var addresses = neighbours.getActiveAdresses();
+
+                for (var addr : addresses) {
                     packet.setAddress(addr);
                     socket.send(packet);
                 }
