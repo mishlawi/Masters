@@ -19,11 +19,7 @@ public class RouteTable {
         this.parent = parent;
         this.distance = distance;
     }
-
-    public Map<InetAddress, Boolean> getRoutes() {
-        return this.routes;
-    }
-
+    
     public void addRoute(InetAddress address) {
         this.routes.put(address, false);
     }

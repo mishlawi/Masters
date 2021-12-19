@@ -164,7 +164,6 @@ public class Listener implements Runnable {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-
         }
     }
 
@@ -268,7 +267,7 @@ public class Listener implements Runnable {
                 // send lost message to children
                 for (InetAddress address : this.routeTable.routes.keySet()) {
                     sendMessage(address, Message.MSG_RT_LOST);
-                    Print.printInfo("Sent lost message to " + this.routeTable.parent);
+                    Print.printInfo("Sent lost message to " + address);
                 }
 
             } catch (IOException e) {
@@ -293,9 +292,11 @@ public class Listener implements Runnable {
             try {
 
                 // send data to children
-                for (InetAddress address : this.routeTable.routes.keySet()) {
-                    sendMessage(address, message);
-                    Print.printInfo("Sent data message to " + this.routeTable.parent);
+                for (var entry : this.routeTable.routes.entrySet()) {
+                    if (entry.getValue()) {
+                        sendMessage(entry.getKey(), message);
+                        Print.printInfo("Sent data message to " + entry.getKey());
+                    }
                 }
 
             } catch (IOException e) {
