@@ -19,7 +19,8 @@ public enum Type {
     RT_ADD,
     RT_DELETE,
     RT_ACTIVATE,
-    RT_DEACTIVATE;
+    RT_DEACTIVATE,
+    RT_LOST;
 
     // array of all possible type values (indexed by the .ordinal() value)
     private static final Type[] types = Type.values();
