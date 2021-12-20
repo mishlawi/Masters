@@ -6,7 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public record Frame(int frameNum, byte[] data) {
+public record VideoFrame(int frameNum, byte[] data) {
 
     public byte[] toBytes() throws IOException {
         var byteStream = new ByteArrayOutputStream();
@@ -18,13 +18,13 @@ public record Frame(int frameNum, byte[] data) {
         return byteStream.toByteArray();
     }
 
-    public static Frame fromBytes(byte[] data) throws IOException {
+    public static VideoFrame fromBytes(byte[] data) throws IOException {
         var in = new DataInputStream(new ByteArrayInputStream(data));
 
         var frameNum = in.readInt();
         var frameData = in.readAllBytes();
 
-        return new Frame(frameNum, frameData);
+        return new VideoFrame(frameNum, frameData);
     }
 
 }

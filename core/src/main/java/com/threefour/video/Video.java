@@ -24,7 +24,7 @@ public class Video {
         return frameNum == videoLength;
     }
 
-    public Frame getNextFrame() throws IOException {
+    public VideoFrame getNextFrame() throws IOException {
         // read current frame size
         var frameSizeBytes = new byte[5];
         fis.read(frameSizeBytes, 0, 5);
@@ -34,7 +34,7 @@ public class Video {
         var frameBytes = new byte[frameSize];
         fis.read(frameBytes, 0, frameSize);
 
-        return new Frame(frameNum++, frameBytes);
+        return new VideoFrame(frameNum++, frameBytes);
     }
 
     public void reset() {

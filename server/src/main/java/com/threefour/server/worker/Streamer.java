@@ -10,7 +10,7 @@ import com.threefour.message.Message;
 import com.threefour.message.Type;
 import com.threefour.overlay.Neighbours;
 import com.threefour.util.Print;
-import com.threefour.video.Frame;
+import com.threefour.video.VideoFrame;
 import com.threefour.video.Video;
 
 public class Streamer implements Runnable {
@@ -45,7 +45,7 @@ public class Streamer implements Runnable {
             }
 
             // read frame
-            Frame frame;
+            VideoFrame frame;
             try {
                 frame = video.getNextFrame();
             } catch (IOException e) {
