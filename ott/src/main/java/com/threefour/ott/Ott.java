@@ -1,105 +1,98 @@
 package com.threefour.ott;
 
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.DatagramPacket;
+import java.io.InputStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.threefour.Constants;
-import com.threefour.message.Message;
-import com.threefour.message.Type;
 import com.threefour.ott.worker.*;
-import com.threefour.util.Pair;
+import com.threefour.overlay.Neighbours;
+import com.threefour.util.Args;
 import com.threefour.util.Print;
+
+import org.yaml.snakeyaml.Yaml;
 
 public class Ott {
 
-    // client's socket
-    private static DatagramSocket socket = null;
-    // map with neighbors' adresses, state and timestamp
-    private static Map<InetAddress, Pair<Boolean, Long>> neighbors = new HashMap<>();
+    public static void main(String[] argv) {
 
-    // neighbors' map locks
-    private static ReadWriteLock nbReadWriteLock = new ReentrantReadWriteLock();
-    private static Lock nbWriteLock = nbReadWriteLock.writeLock();
-    private static Lock nbReadLock = nbReadWriteLock.readLock();
-
-    public static void main(String[] args) {
-
-        System.out.println("Running OTT...");
-
-        // parse the addresses of neighbors
-        for (var ip : args) {
-            try {
-                var address = InetAddress.getByName(ip);
-
-                nbWriteLock.lock();
-                try {
-                    neighbors.put(address, new Pair<>(false, 0L));
-                } finally {
-                    nbWriteLock.unlock();
-                }
-            } catch (UnknownHostException e) {
-                Print.printError("Parsed unknown host " + ip + ": " + e.getMessage());
-            }
+        // parse arguments
+        var args = new Args();
+        var jc = JCommander.newBuilder().addObject(args).build();
+        try {
+            jc.parse(argv);
+        } catch (ParameterException e) {
+            Print.printError(e.getMessage());
+            return;
         }
+
+        // print help message, it case the flag was activated
+        if (args.help) {
+            jc.usage();
+            return;
+        }
+
+        Print.printInfo("Running OTT...");
+
+        Multimap<String, InetAddress> ns = ArrayListMultimap.create();
+
+        // parse neighbours file
+        Yaml yaml = new Yaml();
+        try (InputStream is = new FileInputStream(new File(args.neighboursFile))) {
+            var list = (ArrayList<LinkedHashMap<String, Object>>) yaml.load(is);
+
+            for (var node : list) {
+                var name = (String) node.get("name");
+
+                if (args.neighbours.contains(name)) {
+                    var addresses = ((ArrayList<String>) node.get("addresses")).stream()
+                            .map(ip -> {
+                                try {
+                                    return InetAddress.getByName(ip);
+                                } catch (UnknownHostException e) {
+                                    Print.printError("Problem parsing address " + ip + ": " + e.getMessage());
+                                }
+                                return null;
+                            }).collect(Collectors.toList());
+                    ns.putAll(name, addresses);
+                }
+            }
+        } catch (IOException e1) {
+            Print.printError("Problem parsing YAML file " + args.neighboursFile + ": " + e1.getMessage());
+            return;
+        }
+
+        Print.printInfo("Parsed neighbours: " + ns);
+        Neighbours neighbours = new Neighbours(ns);
 
         // open socket
-        try {
-            socket = new DatagramSocket(Constants.PORT);
+        try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {
+
+            // launch thread to listen to messages
+            new Thread(new Listener(socket, neighbours)).start();
+
+            // launch thread to send periodic heartbeats
+            new Thread(new PulseSender(socket, neighbours)).start();
+
+            // launch thread to manage neighbours' pulses
+            new PulseChecker(neighbours).run();
+
         } catch (SocketException e) {
             Print.printError("Socket error: " + e.getMessage());
-            System.exit(1);
+            return;
         }
 
-        // launch thread to listen to messages
-        new Thread(new Listener(socket, neighbors, nbReadWriteLock)).start();
-
-        // launch thread to send periodic heartbeats
-        new Thread(new PulseSender(socket, neighbors, nbReadLock)).start();
-
-        // launch thread to manage neighbors' pulses
-        new Thread(new PulseChecker(neighbors, nbReadWriteLock)).start();
-
-        // read user input and send messages
-        var reader = new BufferedReader(new InputStreamReader(System.in));
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-
-                // create a message with user's input of the typer USER_INPUT
-                var input = line.getBytes(StandardCharsets.UTF_8);
-                byte[] userInput = (new Message(Type.USER_INPUT, input)).to_bytes();
-                var packet = new DatagramPacket(userInput, userInput.length);
-                packet.setPort(Constants.PORT);
-
-                nbReadLock.lock();
-                try {
-                    neighbors.forEach((address, info) -> {
-                        packet.setAddress(address);
-                        try {
-                            socket.send(packet);
-                        } catch (IOException e) {
-                            Print.printError("Could not send packet: " + e.getMessage());
-                        }
-                    });
-                } finally {
-                    nbReadLock.unlock();
-                }
-
-            }
-        } catch (IOException e) {
-            Print.printError("Could not read user input: " + e.getMessage());
-        }
     }
 }

@@ -6,34 +6,35 @@ import java.util.Map;
 
 public class RouteTable {
 
+    // TODO find a better way
     public final InetAddress server;
 
-    public InetAddress parent;
+    public String parent;
     public int distance;
 
     // map of child nodes + route state
-    public Map<InetAddress, Boolean> routes = new HashMap<>();
+    public Map<String, Boolean> routes = new HashMap<>();
 
-    public RouteTable(InetAddress server, InetAddress parent, int distance) {
+    public RouteTable(InetAddress server, String parent, int distance) {
         this.server = server;
         this.parent = parent;
         this.distance = distance;
     }
-    
-    public void addRoute(InetAddress address) {
-        this.routes.put(address, false);
+
+    public void addRoute(String hostname) {
+        this.routes.put(hostname, false);
     }
 
-    public void deleteRoute(InetAddress address) {
-        this.routes.remove(address);
+    public void deleteRoute(String hostname) {
+        this.routes.remove(hostname);
     }
 
-    public void activateRoute(InetAddress address) {
-        this.routes.replace(address, true);
+    public void activateRoute(String hostname) {
+        this.routes.replace(hostname, true);
     }
 
-    public void deactivateRoute(InetAddress address) {
-        this.routes.replace(address, false);
+    public void deactivateRoute(String hostname) {
+        this.routes.replace(hostname, false);
     }
 
 }

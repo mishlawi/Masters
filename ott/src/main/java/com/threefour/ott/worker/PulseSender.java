@@ -9,6 +9,7 @@ import java.util.concurrent.locks.Lock;
 
 import com.threefour.Constants;
 import com.threefour.message.Message;
+import com.threefour.overlay.Neighbours;
 import com.threefour.util.Pair;
 import com.threefour.util.Print;
 
@@ -16,14 +17,11 @@ public class PulseSender implements Runnable {
 
     private DatagramSocket socket;
 
-    private Map<InetAddress, Pair<Boolean, Long>> neighbors;
-    private Lock nbReadLock;
+    private Neighbours neighbours;
 
-    public PulseSender(DatagramSocket socket,
-            Map<InetAddress, Pair<Boolean, Long>> neighbors, Lock nbReadLock) {
+    public PulseSender(DatagramSocket socket, Neighbours neighbours) {
         this.socket = socket;
-        this.neighbors = neighbors;
-        this.nbReadLock = nbReadLock;
+        this.neighbours = neighbours;
     }
 
     @Override
@@ -35,9 +33,9 @@ public class PulseSender implements Runnable {
             packet.setPort(Constants.PORT);
 
             while (socket != null) {
-                nbReadLock.lock();
+                this.neighbours.readLock.lock();
                 try {
-                    neighbors.forEach((address, info) -> {
+                    neighbours.getAllAddresses().forEach(address -> {
                         packet.setAddress(address);
                         try {
                             socket.send(packet);
@@ -46,7 +44,7 @@ public class PulseSender implements Runnable {
                         }
                     });
                 } finally {
-                    nbReadLock.unlock();
+                    this.neighbours.readLock.unlock();
                 }
 
                 Thread.sleep(Constants.HEARTBEAT_TIME);

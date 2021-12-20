@@ -5,34 +5,27 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 import com.threefour.Constants;
 import com.threefour.message.Announcement;
 import com.threefour.message.Message;
 import com.threefour.message.Type;
 import com.threefour.ott.data.RouteTable;
-import com.threefour.util.Pair;
+import com.threefour.overlay.Neighbours;
 import com.threefour.util.Print;
 
 public class Listener implements Runnable {
 
     protected DatagramSocket socket;
 
-    protected Map<InetAddress, Pair<Boolean, Long>> neighbors;
-    protected Lock nbReadLock;
-    protected Lock nbWriteLock;
+    protected Neighbours neighbours;
 
     protected RouteTable routeTable = null;
 
-    public Listener(DatagramSocket socket,
-            Map<InetAddress, Pair<Boolean, Long>> neighbors, ReadWriteLock nbRWLock) {
+    public Listener(DatagramSocket socket, Neighbours neighbours) {
         this.socket = socket;
-        this.neighbors = neighbors;
-        this.nbReadLock = nbRWLock.readLock();
-        this.nbWriteLock = nbRWLock.writeLock();
+        this.neighbours = neighbours;
     }
 
     // --------------------
@@ -53,7 +46,7 @@ public class Listener implements Runnable {
     }
 
     /**
-     * Floods a message to all available neighbors (except parent).
+     * Floods a message to all available neighbours (except parent).
      * 
      * @param message Message to be flooded.
      * @throws IOException
@@ -63,14 +56,14 @@ public class Listener implements Runnable {
         var packet = new DatagramPacket(buf, buf.length);
         packet.setPort(Constants.PORT);
 
-        this.nbReadLock.lock();
+        this.neighbours.readLock.lock();
         try {
-            neighbors.entrySet()
+            neighbours.getActiveAddresses()
                     .stream()
-                    .filter((entry) -> entry.getValue().getKey()
-                            && !(this.routeTable != null && this.routeTable.parent.equals(entry.getKey())))
-                    .forEach((entry) -> {
-                        packet.setAddress(entry.getKey());
+                    .filter(addr -> !(this.routeTable != null
+                            && this.routeTable.parent.equals(neighbours.getName(addr))))
+                    .forEach(addr -> {
+                        packet.setAddress(addr);
                         try {
                             socket.send(packet);
                         } catch (IOException e) {
@@ -79,7 +72,7 @@ public class Listener implements Runnable {
                         }
                     });
         } finally {
-            this.nbReadLock.unlock();
+            this.neighbours.readLock.unlock();
         }
     }
 
@@ -93,11 +86,13 @@ public class Listener implements Runnable {
      * @param address Address of the sender.
      */
     protected void heartbeat(InetAddress address) {
-        nbWriteLock.lock();
+        this.neighbours.writeLock.lock();
         try {
-            neighbors.put(address, new Pair<>(true, System.currentTimeMillis()));
+            // TODO remove old commented code
+            // neighbours.put(address, new Pair<>(true, System.currentTimeMillis()));
+            neighbours.updateTimestamp(neighbours.getName(address), System.currentTimeMillis());
         } finally {
-            nbWriteLock.unlock();
+            this.neighbours.writeLock.unlock();
         }
         // Print.printInfo("Received a heartbeat from " + address);
     }
@@ -122,12 +117,14 @@ public class Listener implements Runnable {
         // if this is the first announcement
         if (this.routeTable == null) {
             // create a new routing table with `address` as parent
-            this.routeTable = new RouteTable(announcement.server(), address, announcement.distance());
+            var server = announcement.server();
+            var parent = neighbours.getName(address);
+            this.routeTable = new RouteTable(server, parent, announcement.distance());
 
             try {
                 // send RT_ADD to parent
                 sendMessage(address, Message.MSG_RT_ADD);
-                Print.printInfo(address + " is the first parent");
+                Print.printInfo(parent + " is the first parent");
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -135,14 +132,16 @@ public class Listener implements Runnable {
         }
         // if not (and if the distance is shorter)
         else if (announcement.distance() < this.routeTable.distance) {
+            var hostname = neighbours.getName(address);
+
             // if the announcement comes from the current parent
-            if (address.equals(this.routeTable.parent)) {
+            if (hostname.equals(this.routeTable.parent)) {
                 // update its distance
                 this.routeTable.distance = announcement.distance();
             } else {
                 try {
                     // send current parent RT_DELETE
-                    sendMessage(this.routeTable.parent, Message.MSG_RT_DELETE);
+                    sendMessage(neighbours.getAddress(this.routeTable.parent), Message.MSG_RT_DELETE);
                     // send new parent RT_ADD
                     sendMessage(address, Message.MSG_RT_ADD);
                     Print.printInfo(address + " is the new parent");
@@ -152,13 +151,13 @@ public class Listener implements Runnable {
                 }
 
                 // update values
-                this.routeTable.parent = address;
+                this.routeTable.parent = hostname;
                 this.routeTable.distance = announcement.distance();
             }
 
         }
 
-        // propagate announcement to other neighbors with +1 distance
+        // propagate announcement to other neighbours with +1 distance
         try {
             floodMessage(new Message(Type.ANNOUNCEMENT, announcement.increment().toBytes()));
         } catch (IOException e) {
@@ -184,8 +183,9 @@ public class Listener implements Runnable {
      * @param address Address of the child node that wants to establish a route.
      */
     protected void add(InetAddress address) {
-        this.routeTable.addRoute(address);
-        Print.printInfo("Established route to " + address);
+        var hostname = neighbours.getName(address);
+        this.routeTable.addRoute(hostname);
+        Print.printInfo("Established route to " + hostname);
     }
 
     /**
@@ -198,12 +198,13 @@ public class Listener implements Runnable {
         if (this.routeTable != null) {
 
             // activate child's route
-            this.routeTable.activateRoute(address);
-            Print.printInfo("Route to " + address + " activated");
+            var hostname = neighbours.getName(address);
+            this.routeTable.activateRoute(hostname);
+            Print.printInfo("Route to " + hostname + " activated");
 
             try {
                 // sends activation message to parent
-                sendMessage(this.routeTable.parent, Message.MSG_RT_ACTIVATE);
+                sendMessage(neighbours.getAddress(this.routeTable.parent), Message.MSG_RT_ACTIVATE);
                 Print.printInfo("Sent activation message to " + this.routeTable.parent);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -224,12 +225,13 @@ public class Listener implements Runnable {
         if (this.routeTable != null) {
 
             // deactivate child's route
-            this.routeTable.deactivateRoute(address);
-            Print.printInfo("Route to " + address + " deactivated");
+            var hostname = neighbours.getName(address);
+            this.routeTable.deactivateRoute(hostname);
+            Print.printInfo("Route to " + hostname + " deactivated");
 
             try {
                 // sends deactivation message to parent
-                sendMessage(this.routeTable.parent, Message.MSG_RT_DEACTIVATE);
+                sendMessage(neighbours.getAddress(this.routeTable.parent), Message.MSG_RT_DEACTIVATE);
                 Print.printInfo("Sent deactivation message to " + this.routeTable.parent);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -249,8 +251,9 @@ public class Listener implements Runnable {
 
         if (this.routeTable != null) {
             // delete child's route
-            this.routeTable.deleteRoute(address);
-            Print.printInfo("Route to " + address + " deleted");
+            var hostname = neighbours.getName(address);
+            this.routeTable.deleteRoute(hostname);
+            Print.printInfo("Route to " + hostname + " deleted");
         }
 
     }
@@ -265,9 +268,9 @@ public class Listener implements Runnable {
             try {
 
                 // send lost message to children
-                for (InetAddress address : this.routeTable.routes.keySet()) {
-                    sendMessage(address, Message.MSG_RT_LOST);
-                    Print.printInfo("Sent lost message to " + address);
+                for (String hostname : this.routeTable.routes.keySet()) {
+                    sendMessage(neighbours.getAddress(hostname), Message.MSG_RT_LOST);
+                    Print.printInfo("Sent lost message to " + hostname);
                 }
 
             } catch (IOException e) {
@@ -294,7 +297,7 @@ public class Listener implements Runnable {
                 // send data to children
                 for (var entry : this.routeTable.routes.entrySet()) {
                     if (entry.getValue()) {
-                        sendMessage(entry.getKey(), message);
+                        sendMessage(neighbours.getAddress(entry.getKey()), message);
                         Print.printInfo("Sent data message to " + entry.getKey());
                     }
                 }
