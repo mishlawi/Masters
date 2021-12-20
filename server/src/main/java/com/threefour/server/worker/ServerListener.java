@@ -6,9 +6,9 @@ import java.net.InetAddress;
 
 import com.threefour.message.Announcement;
 import com.threefour.message.Message;
-import com.threefour.ott.data.RouteTable;
 import com.threefour.ott.worker.Listener;
 import com.threefour.overlay.Node;
+import com.threefour.overlay.RouteTable;
 import com.threefour.util.Print;
 
 public class ServerListener extends Listener {
