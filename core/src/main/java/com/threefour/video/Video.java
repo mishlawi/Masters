@@ -7,6 +7,7 @@ import java.io.IOException;
 public class Video {
 
     FileInputStream fis;
+    String filename;
     int frameNum;
 
     // TODO might be better to not have this hardcoded
@@ -15,6 +16,7 @@ public class Video {
 
     public Video(String filename) throws FileNotFoundException {
         this.fis = new FileInputStream(filename);
+        this.filename = filename;
         this.frameNum = 0;
     }
 
@@ -33,6 +35,23 @@ public class Video {
         fis.read(frameBytes, 0, frameSize);
 
         return new Frame(frameNum++, frameBytes);
+    }
+
+    public void reset() {
+
+        try {
+            this.fis.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+        }
+
+        try {
+            this.fis = new FileInputStream(filename);
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+        }
+
+        this.frameNum = 0;
     }
 
 }
