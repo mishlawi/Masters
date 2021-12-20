@@ -19,6 +19,7 @@ import com.google.common.collect.Multimap;
 import com.threefour.Constants;
 import com.threefour.overlay.Neighbours;
 import com.threefour.server.worker.Announcer;
+import com.threefour.server.worker.ServerListener;
 import com.threefour.server.worker.Streamer;
 import com.threefour.util.Args;
 import com.threefour.util.Print;
@@ -51,7 +52,7 @@ public class Server {
 
         // parse neighbours file
         Yaml yaml = new Yaml();
-        try (InputStream is = new FileInputStream(new File("topologies/test.yml"))) {
+        try (InputStream is = new FileInputStream(new File(args.neighboursFile))) {
             var list = (ArrayList<LinkedHashMap<String, Object>>) yaml.load(is);
 
             for (var node : list) {
@@ -80,11 +81,13 @@ public class Server {
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {
+
             // launch thread to send periodic info
             new Thread(new Announcer(socket, neighbours)).start();
 
             // send frames
             new Streamer(socket, neighbours, args.video).run();
+
         } catch (SocketException e) {
             Print.printError("Socket error: " + e.getMessage());
             return;
