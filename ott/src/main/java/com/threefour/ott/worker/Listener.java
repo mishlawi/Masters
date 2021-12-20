@@ -19,13 +19,13 @@ import com.threefour.util.Print;
 
 public class Listener implements Runnable {
 
-    private DatagramSocket socket;
+    protected DatagramSocket socket;
 
-    private Map<InetAddress, Pair<Boolean, Long>> neighbors;
-    private Lock nbReadLock;
-    private Lock nbWriteLock;
+    protected Map<InetAddress, Pair<Boolean, Long>> neighbors;
+    protected Lock nbReadLock;
+    protected Lock nbWriteLock;
 
-    private RouteTable routeTable = null;
+    protected RouteTable routeTable = null;
 
     public Listener(DatagramSocket socket,
             Map<InetAddress, Pair<Boolean, Long>> neighbors, ReadWriteLock nbRWLock) {
@@ -46,7 +46,7 @@ public class Listener implements Runnable {
      * @param message Message to be sent.
      * @throws IOException
      */
-    private void sendMessage(InetAddress address, Message message) throws IOException {
+    protected void sendMessage(InetAddress address, Message message) throws IOException {
         var buf = message.to_bytes();
         var packet = new DatagramPacket(buf, buf.length, address, Constants.PORT);
         socket.send(packet);
@@ -58,7 +58,7 @@ public class Listener implements Runnable {
      * @param message Message to be flooded.
      * @throws IOException
      */
-    private void floodMessage(Message message) throws IOException {
+    protected void floodMessage(Message message) throws IOException {
         var buf = message.to_bytes();
         var packet = new DatagramPacket(buf, buf.length);
         packet.setPort(Constants.PORT);
@@ -92,7 +92,7 @@ public class Listener implements Runnable {
      * 
      * @param address Address of the sender.
      */
-    private void heartbeat(InetAddress address) {
+    protected void heartbeat(InetAddress address) {
         nbWriteLock.lock();
         try {
             neighbors.put(address, new Pair<>(true, System.currentTimeMillis()));
@@ -108,7 +108,7 @@ public class Listener implements Runnable {
      * @param address      Address of the sender (parent node).
      * @param announcement Announcement message.
      */
-    private void announcement(InetAddress address, Announcement announcement) {
+    protected void announcement(InetAddress address, Announcement announcement) {
 
         // if the announcement comes directly from the server, its address
         // needs to be instantiated (because it starts at null, since the
@@ -173,7 +173,7 @@ public class Listener implements Runnable {
      * @param address Address of the message source.
      * @param message User input message.
      */
-    private void userInput(InetAddress address, Message message) {
+    protected void userInput(InetAddress address, Message message) {
         var m = new String(message.payload, StandardCharsets.UTF_8);
         Print.printInfo(address + ": " + m);
     }
@@ -183,7 +183,7 @@ public class Listener implements Runnable {
      * 
      * @param address Address of the child node that wants to establish a route.
      */
-    private void routeAdd(InetAddress address) {
+    protected void add(InetAddress address) {
         this.routeTable.addRoute(address);
         Print.printInfo("Established route to " + address);
     }
@@ -193,7 +193,7 @@ public class Listener implements Runnable {
      * 
      * @param address Address of the sender.
      */
-    private void activate(InetAddress address) {
+    protected void activate(InetAddress address) {
 
         if (this.routeTable != null) {
 
@@ -219,7 +219,7 @@ public class Listener implements Runnable {
      * 
      * @param address Address of the sender.
      */
-    private void deactivate(InetAddress address) {
+    protected void deactivate(InetAddress address) {
 
         if (this.routeTable != null) {
 
@@ -245,7 +245,7 @@ public class Listener implements Runnable {
      * 
      * @param address Address of the sender.
      */
-    private void delete(InetAddress address) {
+    protected void delete(InetAddress address) {
 
         if (this.routeTable != null) {
             // delete child's route
@@ -258,7 +258,7 @@ public class Listener implements Runnable {
     /**
      * Processes a route loss message.
      */
-    private void lost() {
+    protected void lost() {
 
         if (this.routeTable != null) {
 
@@ -285,7 +285,7 @@ public class Listener implements Runnable {
     /**
      * Processes a data message.
      */
-    private void data(Message message) {
+    protected void data(Message message) {
 
         if (this.routeTable != null) {
 
@@ -346,7 +346,7 @@ public class Listener implements Runnable {
                         data(message);
                         break;
                     case RT_ADD:
-                        routeAdd(address);
+                        add(address);
                         break;
                     case RT_DELETE:
                         delete(address);
