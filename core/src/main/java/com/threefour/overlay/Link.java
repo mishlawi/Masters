@@ -62,6 +62,7 @@ public class Link {
      */
     public void deactivateLink() {
         this.active = false;
+        this.timestamp = 0;
         this.shiftPreferredAddress();
     }
 
