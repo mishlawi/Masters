@@ -15,9 +15,9 @@ import com.google.common.collect.Multimap;
 import com.threefour.Constants;
 
 /**
- * Class that contains information about the neighbour nodes in the overlay.
+ * Class that contains information about the node state in the overlay.
  */
-public class Neighbours {
+public class Node {
 
     // mapping to get the name of the host from one of its addresses
     private final ImmutableMultimap<InetAddress, String> ADDRESS_TO_NAME_MAPPING;
@@ -27,7 +27,7 @@ public class Neighbours {
     public Lock readLock;
     public Lock writeLock;
 
-    public Neighbours(Multimap<String, InetAddress> neighbours) {
+    public Node(Multimap<String, InetAddress> neighbours) {
         // TODO: there might be a more efficient way to do this
         this.ADDRESS_TO_NAME_MAPPING = new ImmutableListMultimap.Builder<String, InetAddress>()
                 .putAll(neighbours)

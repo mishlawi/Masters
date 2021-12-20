@@ -1,14 +1,14 @@
 package com.threefour.ott.worker;
 
 import com.threefour.Constants;
-import com.threefour.overlay.Neighbours;
+import com.threefour.overlay.Node;
 import com.threefour.util.Print;
 
 public class PulseChecker implements Runnable {
 
-    private Neighbours neighbours;
+    private Node neighbours;
 
-    public PulseChecker(Neighbours neighbours) {
+    public PulseChecker(Node neighbours) {
         this.neighbours = neighbours;
     }
 

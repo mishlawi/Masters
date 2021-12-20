@@ -19,7 +19,7 @@ import com.google.common.collect.Multimap;
 import com.threefour.Constants;
 import com.threefour.ott.worker.PulseChecker;
 import com.threefour.ott.worker.PulseSender;
-import com.threefour.overlay.Neighbours;
+import com.threefour.overlay.Node;
 import com.threefour.server.worker.Announcer;
 import com.threefour.server.worker.ServerListener;
 import com.threefour.server.worker.Streamer;
@@ -79,7 +79,7 @@ public class Server {
         }
 
         Print.printInfo("Parsed neighbours: " + ns);
-        Neighbours neighbours = new Neighbours(ns);
+        Node neighbours = new Node(ns);
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {

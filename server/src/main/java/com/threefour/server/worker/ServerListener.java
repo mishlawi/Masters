@@ -8,12 +8,12 @@ import com.threefour.message.Announcement;
 import com.threefour.message.Message;
 import com.threefour.ott.data.RouteTable;
 import com.threefour.ott.worker.Listener;
-import com.threefour.overlay.Neighbours;
+import com.threefour.overlay.Node;
 import com.threefour.util.Print;
 
 public class ServerListener extends Listener {
 
-    public ServerListener(DatagramSocket socket, Neighbours neighbours) {
+    public ServerListener(DatagramSocket socket, Node neighbours) {
         super(socket, neighbours);
         this.routeTable = new RouteTable(null, null, 0);
     }

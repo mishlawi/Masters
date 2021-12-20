@@ -14,7 +14,7 @@ import com.threefour.message.Message;
 import com.threefour.message.Type;
 import com.threefour.ott.data.RouteTable;
 import com.threefour.ott.worker.Listener;
-import com.threefour.overlay.Neighbours;
+import com.threefour.overlay.Node;
 import com.threefour.util.Pair;
 import com.threefour.util.Print;
 import com.threefour.video.VideoFrame;
@@ -23,7 +23,7 @@ public class ClientListener extends Listener {
 
     List<VideoFrame> f;
 
-    public ClientListener(List<VideoFrame> f, DatagramSocket socket, Neighbours neighbors) {
+    public ClientListener(List<VideoFrame> f, DatagramSocket socket, Node neighbors) {
         super(socket, neighbors);
         this.f = f;
     }

@@ -8,7 +8,7 @@ import java.net.DatagramSocket;
 import com.threefour.Constants;
 import com.threefour.message.Message;
 import com.threefour.message.Type;
-import com.threefour.overlay.Neighbours;
+import com.threefour.overlay.Node;
 import com.threefour.util.Print;
 import com.threefour.video.VideoFrame;
 import com.threefour.video.Video;
@@ -16,11 +16,11 @@ import com.threefour.video.Video;
 public class Streamer implements Runnable {
 
     private DatagramSocket socket;
-    private Neighbours neighbours;
+    private Node neighbours;
 
     private String filename;
 
-    public Streamer(DatagramSocket socket, Neighbours neighbours, String filename) {
+    public Streamer(DatagramSocket socket, Node neighbours, String filename) {
         this.socket = socket;
         this.neighbours = neighbours;
         this.filename = filename;

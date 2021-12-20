@@ -27,7 +27,7 @@ import com.threefour.client.worker.ClientListener;
 import com.threefour.client.worker.GUI;
 import com.threefour.ott.worker.PulseChecker;
 import com.threefour.ott.worker.PulseSender;
-import com.threefour.overlay.Neighbours;
+import com.threefour.overlay.Node;
 import com.threefour.util.Args;
 import com.threefour.util.Pair;
 import com.threefour.util.Print;
@@ -95,7 +95,7 @@ public class Client {
         }
 
         Print.printInfo("Parsed neighbours: " + ns);
-        Neighbours neighbours = new Neighbours(ns);
+        Node neighbours = new Node(ns);
         List<VideoFrame> frame = new ArrayList<>();
 
         // open socket

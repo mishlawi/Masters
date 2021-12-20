@@ -8,14 +8,14 @@ import com.threefour.Constants;
 import com.threefour.message.Announcement;
 import com.threefour.message.Message;
 import com.threefour.message.Type;
-import com.threefour.overlay.Neighbours;
+import com.threefour.overlay.Node;
 
 public class Announcer implements Runnable {
 
     private DatagramSocket socket;
-    private Neighbours neighbours;
+    private Node neighbours;
 
-    public Announcer(DatagramSocket socket, Neighbours neighbours) {
+    public Announcer(DatagramSocket socket, Node neighbours) {
         this.socket = socket;
         this.neighbours = neighbours;
     }

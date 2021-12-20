@@ -9,7 +9,7 @@ import java.util.concurrent.locks.Lock;
 
 import com.threefour.Constants;
 import com.threefour.message.Message;
-import com.threefour.overlay.Neighbours;
+import com.threefour.overlay.Node;
 import com.threefour.util.Pair;
 import com.threefour.util.Print;
 
@@ -17,9 +17,9 @@ public class PulseSender implements Runnable {
 
     private DatagramSocket socket;
 
-    private Neighbours neighbours;
+    private Node neighbours;
 
-    public PulseSender(DatagramSocket socket, Neighbours neighbours) {
+    public PulseSender(DatagramSocket socket, Node neighbours) {
         this.socket = socket;
         this.neighbours = neighbours;
     }

@@ -18,7 +18,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.threefour.Constants;
 import com.threefour.ott.worker.*;
-import com.threefour.overlay.Neighbours;
+import com.threefour.overlay.Node;
 import com.threefour.util.Args;
 import com.threefour.util.Print;
 
@@ -75,7 +75,7 @@ public class Ott {
         }
 
         Print.printInfo("Parsed neighbours: " + ns);
-        Neighbours neighbours = new Neighbours(ns);
+        Node neighbours = new Node(ns);
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {
