@@ -17,6 +17,8 @@ import com.beust.jcommander.ParameterException;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.threefour.Constants;
+import com.threefour.ott.worker.PulseChecker;
+import com.threefour.ott.worker.PulseSender;
 import com.threefour.overlay.Neighbours;
 import com.threefour.server.worker.Announcer;
 import com.threefour.server.worker.ServerListener;
@@ -81,6 +83,15 @@ public class Server {
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {
+
+            // launch thread to send periodic heartbeats
+            new Thread(new PulseSender(socket, neighbours)).start();
+
+            // launch thread to manage neighbours' pulses
+            new Thread(new PulseChecker(neighbours)).start();
+
+            // launch thread to listen to messages
+            new Thread(new ServerListener(socket, neighbours)).start();
 
             // launch thread to send periodic info
             new Thread(new Announcer(socket, neighbours)).start();

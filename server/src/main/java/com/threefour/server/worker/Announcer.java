@@ -29,7 +29,7 @@ public class Announcer implements Runnable {
 
             while (true) {
 
-                var addresses = neighbours.getActiveAdresses();
+                var addresses = neighbours.getActiveAddresses();
 
                 for (var neighbor : addresses) {
                     packet.setAddress(neighbor);

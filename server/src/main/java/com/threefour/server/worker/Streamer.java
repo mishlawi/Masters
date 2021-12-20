@@ -38,8 +38,11 @@ public class Streamer implements Runnable {
             return;
         }
 
-        while (!video.hasEnded()) {
-            // TODO if it has reached the end, loop back to the beginning
+        while (true) {
+
+            if (video.hasEnded()) {
+                video.reset();
+            }
 
             // read frame
             Frame frame;
@@ -56,7 +59,7 @@ public class Streamer implements Runnable {
                 var packet = new DatagramPacket(message, message.length);
                 packet.setPort(Constants.PORT);
 
-                var addresses = neighbours.getActiveAdresses();
+                var addresses = neighbours.getActiveAddresses();
 
                 for (var addr : addresses) {
                     packet.setAddress(addr);
