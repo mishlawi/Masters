@@ -111,6 +111,10 @@ public class Listener implements Runnable {
         if (announcement.distance() == 0) {
             announcement = new Announcement((byte) 0, address);
         }
+        // if the announcement has jumped too many nodes, it is dropped
+        else if (announcement.distance() > Constants.ANNOUNCE_TTL) {
+            return;
+        }
 
         Print.printInfo(address + ": " + announcement);
 

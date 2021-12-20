@@ -14,5 +14,7 @@ public class Constants {
 
     // time gap between announcements (ms)
     public static final long ANNOUNCE_TIME = 10000L;
+    // number of jumps before the announcement is dropped
+    public static final byte ANNOUNCE_TTL = 20;
 
 }
