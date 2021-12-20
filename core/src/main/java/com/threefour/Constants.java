@@ -4,8 +4,8 @@ public class Constants {
 
     // default port
     public static final int PORT = 12345;
-    // default buffer size
-    public static final int BUFFER_SIZE = 1024;
+    // default buffer size (theoretical maximum UDP payload size)
+    public static final int BUFFER_SIZE = 65507;
 
     // time gap between heartbeats (ms)
     public static final long HEARTBEAT_TIME = 1000L;
