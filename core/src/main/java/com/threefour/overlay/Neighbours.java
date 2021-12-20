@@ -3,12 +3,16 @@ package com.threefour.overlay;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.threefour.Constants;
 
 /**
  * Class that contains information about the neighbour nodes in the overlay.
@@ -20,6 +24,8 @@ public class Neighbours {
 
     // state of neighbours
     private Map<String, Link> links;
+    public Lock readLock;
+    public Lock writeLock;
 
     public Neighbours(Multimap<String, InetAddress> neighbours) {
         // TODO: there might be a more efficient way to do this
@@ -28,12 +34,26 @@ public class Neighbours {
                 .build()
                 .inverse();
         this.links = Maps.toMap(neighbours.keySet(), key -> new Link(neighbours.get(key)));
+
+        ReadWriteLock linksRWLock = new ReentrantReadWriteLock();
+        this.readLock = linksRWLock.writeLock();
+        this.writeLock = linksRWLock.readLock();
     }
 
     /**
      * @return List of the addresses of the active neighbors.
      */
-    public List<InetAddress> getActiveAdresses() {
+    public List<InetAddress> getAllAddresses() {
+        return this.links.values()
+                .stream()
+                .map(link -> link.getAddress())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * @return List of the addresses of the active neighbors.
+     */
+    public List<InetAddress> getActiveAddresses() {
         return this.links.values()
                 .stream()
                 .filter(link -> link.isActive())
@@ -81,6 +101,24 @@ public class Neighbours {
      */
     public void updateTimestamp(String name, long timestamp) {
         this.links.get(name).updateTimestamp(timestamp);
+    }
+
+    /**
+     * Checks the timestamps of all currently active links for timeouts. If a
+     * timeout has occurred, the link is set as deactivated.
+     */
+    public void updateLinkStates() {
+        for (var link : this.links.values()) {
+            // if the neighbour is active
+            if (link.isActive() == true) {
+                long gap = System.currentTimeMillis() - link.getTimestamp();
+
+                if (gap > Constants.TIMEOUT) {
+                    // neighbours.put(address, new Pair<>(false, info.getValue()));
+                    link.deactivateLink();
+                }
+            }
+        }
     }
 
 }
