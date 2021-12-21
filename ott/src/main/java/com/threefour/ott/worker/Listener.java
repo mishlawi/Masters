@@ -29,7 +29,8 @@ public class Listener implements Runnable {
                 this.node.socket.receive(packet);
             } catch (IOException e) {
                 Print.printError("Problem recieving packet: " + e.getMessage());
-                continue;
+                e.printStackTrace();
+                return;
             }
 
             try {

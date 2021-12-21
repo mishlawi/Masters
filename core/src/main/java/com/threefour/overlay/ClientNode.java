@@ -78,12 +78,20 @@ public class ClientNode extends Node {
                         sendMessage(this.getAddress(this.routeTable.parent), Message.MSG_RT_DELETE);
                         // send new parent RT_ADD
                         sendMessage(address, Message.MSG_RT_ADD);
-                        sendMessage(address, Message.MSG_RT_ACTIVATE);
                         Print.printInfo(address + " is the new parent");
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+                }
+
+                // for safety reasons, the activation message is always sent 
+                // upon updating routes
+                try {
+                    sendMessage(address, Message.MSG_RT_ACTIVATE);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
 
                 this.routeTable.parent = hostname;
@@ -99,6 +107,17 @@ public class ClientNode extends Node {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void lost() {
+        this.wlRoutes.lock();
+        try {
+            // delete route table
+            this.routeTable = null;
+        } finally {
+            this.wlRoutes.unlock();
         }
     }
 

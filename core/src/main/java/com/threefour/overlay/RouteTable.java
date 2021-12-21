@@ -34,13 +34,13 @@ public class RouteTable {
     }
 
     public void activateRoute(String hostname) {
-        if (this.routes.replace(hostname, true).equals(Boolean.FALSE)) {
+        if (Boolean.FALSE.equals(this.routes.replace(hostname, true))) {
             this.activeRoutes += 1;
         }
     }
 
     public void deactivateRoute(String hostname) {
-        if (this.routes.replace(hostname, false).equals(Boolean.TRUE)) {
+        if (Boolean.TRUE.equals(this.routes.replace(hostname, false))) {
             this.activeRoutes -= 1;
         }
     }

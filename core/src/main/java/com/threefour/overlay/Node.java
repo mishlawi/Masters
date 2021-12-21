@@ -39,7 +39,6 @@ public class Node {
     public Lock rlRoutes;
     public Lock wlRoutes;
 
-    // main constructor
     public Node(DatagramSocket socket, Multimap<String, InetAddress> neighbours) {
         this.socket = socket;
 
@@ -90,20 +89,6 @@ public class Node {
     }
 
     /**
-     * Deactivates the link with the neighbour of the given name.
-     * 
-     * @param name Name of the neighbour.
-     */
-    public void deactivateLink(String name) {
-        this.wlLinks.lock();
-        try {
-            this.links.get(name).deactivateLink();
-        } finally {
-            this.wlLinks.unlock();
-        }
-    }
-
-    /**
      * Updates the timestamp of the link with the given neighbour.
      * 
      * @param name      Name of the neighbour.
@@ -141,12 +126,22 @@ public class Node {
                         this.wlRoutes.lock();
                         try {
                             if (this.routeTable != null) {
-                                // and if there is a child route in that link
-                                if (this.routeTable.routes.containsKey(name)) {
+                                var active = this.routeTable.routes.get(name);
+
+                                // and if it was a link with a child node
+                                if (active != null) {
                                     // then it is deleted
                                     delete(getAddress(name));
+
+                                    // if there are no more active routes
+                                    if (this.routeTable.activeRoutes == 0) {
+                                        // then the parent is notified
+                                        if (this.routeTable.parent != null) {
+                                            deactivate(getAddress(this.routeTable.parent));
+                                        }
+                                    }
                                 }
-                                // or if it is the parent
+                                // or if it was the link with the parent
                                 else if (name.equals(this.routeTable.parent)) {
                                     // then the route is declared as lost
                                     lost();
@@ -324,7 +319,7 @@ public class Node {
                 try {
                     // send RT_ADD to parent
                     sendMessage(address, Message.MSG_RT_ADD);
-                    Print.printInfo(parent + " is the first parent");
+                    Print.printInfo("New routing table with " + parent + " as a parent");
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -332,13 +327,13 @@ public class Node {
             }
             // if not (and if the distance is shorter)
             else if (announcement.distance() < this.routeTable.distance) {
-                var hostname = this.getName(address);
+                var hostname = getName(address);
 
                 // if the announcement doesn't come from the current parent
                 if (!hostname.equals(this.routeTable.parent)) {
                     try {
                         // send current parent RT_DELETE
-                        sendMessage(this.getAddress(this.routeTable.parent), Message.MSG_RT_DELETE);
+                        sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_DELETE);
                         // send new parent RT_ADD
                         sendMessage(address, Message.MSG_RT_ADD);
                         Print.printInfo(address + " is the new parent");
@@ -378,19 +373,22 @@ public class Node {
         this.wlRoutes.lock();
         try {
             this.routeTable.activateRoute(hostname);
+
+            // if there were no routes active before
+            if (this.routeTable.activeRoutes == 1) {
+                try {
+                    // sends activation message to parent
+                    this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_ACTIVATE);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                Print.printInfo("Sent activation message to " + this.routeTable.parent);
+            }
         } finally {
             this.wlRoutes.unlock();
         }
         Print.printInfo("Route to " + hostname + " activated");
-
-        try {
-            // sends activation message to parent
-            this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_ACTIVATE);
-            Print.printInfo("Sent activation message to " + this.routeTable.parent);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
         // }
 
@@ -410,19 +408,22 @@ public class Node {
         this.wlRoutes.lock();
         try {
             this.routeTable.deactivateRoute(hostname);
+
+            // if there are no more active links, then a deactivation message
+            // is sent to the parent
+            if (this.routeTable.activeRoutes == 0) {
+                try {
+                    this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_DEACTIVATE);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                Print.printInfo("Sent deactivation message to " + this.routeTable.parent);
+            }
         } finally {
             this.wlRoutes.unlock();
         }
         Print.printInfo("Route to " + hostname + " deactivated");
-
-        try {
-            // sends deactivation message to parent
-            this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_DEACTIVATE);
-            Print.printInfo("Sent deactivation message to " + this.routeTable.parent);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
         // }
 
@@ -456,6 +457,18 @@ public class Node {
         this.wlRoutes.lock();
         try {
             this.routeTable.deleteRoute(hostname);
+
+            // if there are no more active links, then a deactivation message
+            // is sent to the parent
+            if (this.routeTable.activeRoutes == 0) {
+                try {
+                    this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_DEACTIVATE);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                Print.printInfo("Sent deactivation message to " + this.routeTable.parent);
+            }
         } finally {
             this.wlRoutes.unlock();
         }

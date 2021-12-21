@@ -96,8 +96,8 @@ public class Client {
             // launch graphical interface
             new GUI(frame);
 
-            // launch thread to manage neighbours' pulses
-            new Thread(new PulseChecker(node)).run();
+            // manage neighbours' pulses
+            new PulseChecker(node).run();
 
         } catch (SocketException e) {
             Print.printError("Socket error: " + e.getMessage());
