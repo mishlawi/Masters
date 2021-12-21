@@ -53,6 +53,11 @@ public class ServerNode extends Node {
     }
 
     @Override
+    public void ping(InetAddress __ia, Announcement __a) {
+        return;
+    }
+
+    @Override
     public void lost() {
         return;
     }

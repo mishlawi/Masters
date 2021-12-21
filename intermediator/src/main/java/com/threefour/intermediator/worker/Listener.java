@@ -45,6 +45,9 @@ public class Listener implements Runnable {
                     case ANNOUNCEMENT:
                         this.node.announcement(address, Announcement.fromBytes(message.payload));
                         break;
+                    case PING:
+                        this.node.ping(address, Announcement.fromBytes(message.payload));
+                        break;
                     case DATA:
                         this.node.data(message);
                         break;

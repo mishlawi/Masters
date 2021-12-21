@@ -359,6 +359,19 @@ public class Node {
         }
     }
 
+    public void ping(InetAddress address, Announcement announcement) {
+        var name = getName(address);
+        Print.printInfo("PING {jumps: " + announcement.distance() + ", name: " + name + "}");
+
+        // propagate ping to child nodes with +1 distance
+        try {
+            this.floodRouteMessage(new Message(Type.PING, announcement.increment().toBytes()));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Processes a route activation message.
      * 
