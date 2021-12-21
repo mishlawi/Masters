@@ -366,8 +366,6 @@ public class Node {
      */
     public void activate(InetAddress address) {
 
-        // if (this.routeTable != null) {
-
         // activate child's route
         var hostname = getName(address);
         this.wlRoutes.lock();
@@ -390,8 +388,6 @@ public class Node {
         }
         Print.printInfo("Route to " + hostname + " activated");
 
-        // }
-
     }
 
     /**
@@ -400,8 +396,6 @@ public class Node {
      * @param address Address of the sender.
      */
     public void deactivate(InetAddress address) {
-
-        // if (this.routeTable != null) {
 
         // deactivate child's route
         var hostname = getName(address);
@@ -424,8 +418,6 @@ public class Node {
             this.wlRoutes.unlock();
         }
         Print.printInfo("Route to " + hostname + " deactivated");
-
-        // }
 
     }
 
@@ -451,7 +443,7 @@ public class Node {
      * @param address Address of the sender.
      */
     public void delete(InetAddress address) {
-        // if (this.routeTable != null) {
+
         // delete child's route
         var hostname = getName(address);
         this.wlRoutes.lock();
@@ -473,14 +465,13 @@ public class Node {
             this.wlRoutes.unlock();
         }
         Print.printInfo("Route to " + hostname + " deleted");
-        // }
+
     }
 
     /**
      * Processes a route loss message.
      */
     public void lost() {
-        // if (this.routeTable != null) {
 
         try {
             // send lost message to children
@@ -501,7 +492,6 @@ public class Node {
             this.wlRoutes.unlock();
         }
 
-        // }
     }
 
     /**

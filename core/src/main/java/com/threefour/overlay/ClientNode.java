@@ -85,7 +85,7 @@ public class ClientNode extends Node {
                     }
                 }
 
-                // for safety reasons, the activation message is always sent 
+                // for safety reasons, the activation message is always sent
                 // upon updating routes
                 try {
                     sendMessage(address, Message.MSG_RT_ACTIVATE);
