@@ -56,7 +56,7 @@
 
   <modules>
     <module>core</module>
-    <module>ott</module>
+    <module>intermediator</module>
     <module>server</module>
     <module>client</module>
   </modules>

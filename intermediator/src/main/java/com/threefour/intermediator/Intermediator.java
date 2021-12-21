@@ -1,4 +1,4 @@
-package com.threefour.ott;
+package com.threefour.intermediator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,14 +17,14 @@ import com.beust.jcommander.ParameterException;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.threefour.Constants;
-import com.threefour.ott.worker.*;
+import com.threefour.intermediator.worker.*;
 import com.threefour.overlay.Node;
 import com.threefour.util.Args;
 import com.threefour.util.Print;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class Ott {
+public class Intermediator {
 
     public static void main(String[] argv) {
 
@@ -44,7 +44,7 @@ public class Ott {
             return;
         }
 
-        Print.printInfo("Running OTT...");
+        Print.printInfo("Running intermediator...");
 
         Multimap<String, InetAddress> ns = ArrayListMultimap.create();
 

@@ -12,6 +12,7 @@ public enum Type {
     // general types
     HEARTBEAT,
     ANNOUNCEMENT,
+    PING,
     DATA,
 
     // route related types

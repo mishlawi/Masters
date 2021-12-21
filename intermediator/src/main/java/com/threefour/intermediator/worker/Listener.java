@@ -1,4 +1,4 @@
-package com.threefour.ott.worker;
+package com.threefour.intermediator.worker;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

@@ -40,7 +40,7 @@ public class ClientNode extends Node {
             return;
         }
 
-        Print.printInfo(address + ": " + announcement);
+        // Print.printInfo(address + ": " + announcement);
 
         this.wlRoutes.lock();
         try {

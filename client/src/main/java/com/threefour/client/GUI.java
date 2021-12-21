@@ -15,7 +15,7 @@ public class GUI {
     // GUI variables
     JFrame f = new JFrame("Cliente de Testes");
     JButton playButton = new JButton("Play");
-    JButton tearButton = new JButton("Teardown");
+    JButton stopButton = new JButton("Stop");
     JPanel mainPanel = new JPanel();
     JPanel buttonPanel = new JPanel();
     JLabel iconLabel = new JLabel();
@@ -35,11 +35,11 @@ public class GUI {
         // buttons
         buttonPanel.setLayout(new GridLayout(1, 0));
         buttonPanel.add(playButton);
-        buttonPanel.add(tearButton);
+        buttonPanel.add(stopButton);
 
         // handlers
         playButton.addActionListener(new playButtonListener());
-        tearButton.addActionListener(new tearButtonListener());
+        stopButton.addActionListener(new stopButtonListener());
 
         // Iiage display label
         iconLabel.setIcon(null);
@@ -71,7 +71,7 @@ public class GUI {
         }
     }
 
-    class tearButtonListener implements ActionListener {
+    class stopButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             // System.out.println("Teardown Button pressed !");
             cTimer.stop();

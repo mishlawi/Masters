@@ -1,4 +1,4 @@
-package com.threefour.ott.worker;
+package com.threefour.intermediator.worker;
 
 import com.threefour.Constants;
 import com.threefour.overlay.Node;
