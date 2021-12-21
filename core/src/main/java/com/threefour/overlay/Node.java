@@ -123,25 +123,43 @@ public class Node {
      * timeout has occurred, the link is set as deactivated.
      */
     public void updateLinkStates() {
-        this.rlLinks.lock();
+        this.wlLinks.lock();
         try {
-            for (var link : this.links.values()) {
-                // if the neighbour is active
+            for (var entry : this.links.entrySet()) {
+                var name = entry.getKey();
+                var link = entry.getValue();
+
+                // if the link with the neighbour is "active"
                 if (link.isActive() == true) {
                     long gap = System.currentTimeMillis() - link.getTimestamp();
 
+                    // if the link timed out
                     if (gap > Constants.TIMEOUT) {
-                        this.wlLinks.lock();
+                        // then it is deactivated
+                        link.deactivateLink();
+
+                        this.wlRoutes.lock();
                         try {
-                            link.deactivateLink();
+                            if (this.routeTable != null) {
+                                // and if there is a child route in that link
+                                if (this.routeTable.routes.containsKey(name)) {
+                                    // then it is deleted
+                                    delete(getAddress(name));
+                                }
+                                // or if it is the parent
+                                else if (name.equals(this.routeTable.parent)) {
+                                    // then the route is declared as lost
+                                    lost();
+                                }
+                            }
                         } finally {
-                            this.wlLinks.unlock();
+                            this.wlRoutes.unlock();
                         }
                     }
                 }
             }
         } finally {
-            this.rlLinks.unlock();
+            this.wlLinks.unlock();
         }
     }
 
@@ -293,7 +311,7 @@ public class Node {
 
         Print.printInfo(address + ": " + announcement);
 
-        this.rlRoutes.lock();
+        this.wlRoutes.lock();
         try {
             // if this is the first announcement
             if (this.routeTable == null) {
@@ -301,12 +319,7 @@ public class Node {
                 var server = announcement.server();
                 var parent = getName(address);
 
-                this.wlRoutes.lock();
-                try {
-                    this.routeTable = new RouteTable(server, parent, announcement.distance());
-                } finally {
-                    this.wlRoutes.unlock();
-                }
+                this.routeTable = new RouteTable(server, parent, announcement.distance());
 
                 try {
                     // send RT_ADD to parent
@@ -335,16 +348,11 @@ public class Node {
                     }
                 }
 
-                this.wlRoutes.lock();
-                try {
-                    this.routeTable.parent = hostname;
-                    this.routeTable.distance = announcement.distance();
-                } finally {
-                    this.wlRoutes.unlock();
-                }
+                this.routeTable.parent = hostname;
+                this.routeTable.distance = announcement.distance();
             }
         } finally {
-            this.rlRoutes.unlock();
+            this.wlRoutes.unlock();
         }
 
         // propagate announcement to other neighbours with +1 distance
@@ -363,28 +371,28 @@ public class Node {
      */
     public void activate(InetAddress address) {
 
-        if (this.routeTable != null) {
+        // if (this.routeTable != null) {
 
-            // activate child's route
-            var hostname = getName(address);
-            this.wlRoutes.lock();
-            try {
-                this.routeTable.activateRoute(hostname);
-            } finally {
-                this.wlRoutes.unlock();
-            }
-            Print.printInfo("Route to " + hostname + " activated");
-
-            try {
-                // sends activation message to parent
-                this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_ACTIVATE);
-                Print.printInfo("Sent activation message to " + this.routeTable.parent);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
+        // activate child's route
+        var hostname = getName(address);
+        this.wlRoutes.lock();
+        try {
+            this.routeTable.activateRoute(hostname);
+        } finally {
+            this.wlRoutes.unlock();
         }
+        Print.printInfo("Route to " + hostname + " activated");
+
+        try {
+            // sends activation message to parent
+            this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_ACTIVATE);
+            Print.printInfo("Sent activation message to " + this.routeTable.parent);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        // }
 
     }
 
@@ -395,28 +403,28 @@ public class Node {
      */
     public void deactivate(InetAddress address) {
 
-        if (this.routeTable != null) {
+        // if (this.routeTable != null) {
 
-            // deactivate child's route
-            var hostname = getName(address);
-            this.wlRoutes.lock();
-            try {
-                this.routeTable.deactivateRoute(hostname);
-            } finally {
-                this.wlRoutes.unlock();
-            }
-            Print.printInfo("Route to " + hostname + " deactivated");
-
-            try {
-                // sends deactivation message to parent
-                this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_DEACTIVATE);
-                Print.printInfo("Sent deactivation message to " + this.routeTable.parent);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
+        // deactivate child's route
+        var hostname = getName(address);
+        this.wlRoutes.lock();
+        try {
+            this.routeTable.deactivateRoute(hostname);
+        } finally {
+            this.wlRoutes.unlock();
         }
+        Print.printInfo("Route to " + hostname + " deactivated");
+
+        try {
+            // sends deactivation message to parent
+            this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_DEACTIVATE);
+            Print.printInfo("Sent deactivation message to " + this.routeTable.parent);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        // }
 
     }
 
@@ -442,64 +450,69 @@ public class Node {
      * @param address Address of the sender.
      */
     public void delete(InetAddress address) {
-        if (this.routeTable != null) {
-            // delete child's route
-            var hostname = getName(address);
-            this.wlRoutes.lock();
-            try {
-                this.routeTable.deleteRoute(hostname);
-            } finally {
-                this.wlRoutes.unlock();
-            }
-            Print.printInfo("Route to " + hostname + " deleted");
+        // if (this.routeTable != null) {
+        // delete child's route
+        var hostname = getName(address);
+        this.wlRoutes.lock();
+        try {
+            this.routeTable.deleteRoute(hostname);
+        } finally {
+            this.wlRoutes.unlock();
         }
+        Print.printInfo("Route to " + hostname + " deleted");
+        // }
     }
 
     /**
      * Processes a route loss message.
      */
     public void lost() {
-        if (this.routeTable != null) {
+        // if (this.routeTable != null) {
 
-            try {
-                // send lost message to children
-                for (String hostname : this.routeTable.routes.keySet()) {
-                    this.sendMessage(getAddress(hostname), Message.MSG_RT_LOST);
-                    Print.printInfo("Sent lost message to " + hostname);
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+        try {
+            // send lost message to children
+            for (String hostname : this.routeTable.routes.keySet()) {
+                this.sendMessage(getAddress(hostname), Message.MSG_RT_LOST);
+                Print.printInfo("Sent lost message to " + hostname);
             }
-
-            this.wlRoutes.lock();
-            try {
-                // delete route table
-                this.routeTable = null;
-            } finally {
-                this.wlRoutes.unlock();
-            }
-
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+
+        this.wlRoutes.lock();
+        try {
+            // delete route table
+            this.routeTable = null;
+        } finally {
+            this.wlRoutes.unlock();
+        }
+
+        // }
     }
 
     /**
      * Processes a data message.
      */
     public void data(Message message) {
-        if (this.routeTable != null) {
-            try {
-                // send data to children
-                for (var entry : this.routeTable.routes.entrySet()) {
-                    if (entry.getValue()) {
-                        this.sendMessage(getAddress(entry.getKey()), message);
-                        Print.printInfo("Sent data message to " + entry.getKey());
+        this.rlRoutes.lock();
+        try {
+            if (this.routeTable != null) {
+                try {
+                    // send data to children
+                    for (var entry : this.routeTable.routes.entrySet()) {
+                        if (entry.getValue()) {
+                            this.sendMessage(getAddress(entry.getKey()), message);
+                            Print.printInfo("Sent data message to " + entry.getKey());
+                        }
                     }
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
+        } finally {
+            this.rlRoutes.unlock();
         }
     }
 

@@ -42,7 +42,7 @@ public class ClientNode extends Node {
 
         Print.printInfo(address + ": " + announcement);
 
-        this.rlRoutes.lock();
+        this.wlRoutes.lock();
         try {
             // if this is the first announcement
             if (this.routeTable == null) {
@@ -78,6 +78,7 @@ public class ClientNode extends Node {
                         sendMessage(this.getAddress(this.routeTable.parent), Message.MSG_RT_DELETE);
                         // send new parent RT_ADD
                         sendMessage(address, Message.MSG_RT_ADD);
+                        sendMessage(address, Message.MSG_RT_ACTIVATE);
                         Print.printInfo(address + " is the new parent");
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
@@ -85,18 +86,11 @@ public class ClientNode extends Node {
                     }
                 }
 
-                this.wlRoutes.lock();
-                try {
-                    if (!hostname.equals(this.routeTable.parent)) {
-                        this.routeTable.parent = hostname;
-                    }
-                    this.routeTable.distance = announcement.distance();
-                } finally {
-                    this.wlRoutes.unlock();
-                }
+                this.routeTable.parent = hostname;
+                this.routeTable.distance = announcement.distance();
             }
         } finally {
-            this.rlRoutes.unlock();
+            this.wlRoutes.unlock();
         }
 
         // propagate announcement to other neighbours with +1 distance

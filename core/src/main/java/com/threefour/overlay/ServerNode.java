@@ -20,7 +20,7 @@ public class ServerNode extends Node {
     // --------------------
 
     public void activate(InetAddress address) {
-        if (this.routeTable != null) {
+        // if (this.routeTable != null) {
             // activate child's route
             var hostname = getName(address);
             this.wlRoutes.lock();
@@ -30,11 +30,11 @@ public class ServerNode extends Node {
                 this.wlRoutes.unlock();
             }
             Print.printInfo("Route to " + hostname + " activated");
-        }
+        // }
     }
 
     public void deactivate(InetAddress address) {
-        if (this.routeTable != null) {
+        // if (this.routeTable != null) {
             // deactivate child's route
             var hostname = getName(address);
             this.wlRoutes.lock();
@@ -44,7 +44,7 @@ public class ServerNode extends Node {
                 this.wlRoutes.unlock();
             }
             Print.printInfo("Route to " + hostname + " deactivated");
-        }
+        // }
     }
 
     // --------------------
