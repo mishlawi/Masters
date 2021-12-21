@@ -75,19 +75,20 @@ public class Ott {
         }
 
         Print.printInfo("Parsed neighbours: " + ns);
-        Node neighbours = new Node(ns);
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {
 
+            Node node = new Node(socket, ns);
+
             // launch thread to listen to messages
-            new Thread(new Listener(socket, neighbours)).start();
+            new Thread(new Listener(node)).start();
 
             // launch thread to send periodic heartbeats
-            new Thread(new PulseSender(socket, neighbours)).start();
+            new Thread(new PulseSender(node)).start();
 
             // launch thread to manage neighbours' pulses
-            new PulseChecker(neighbours).run();
+            new PulseChecker(node).run();
 
         } catch (SocketException e) {
             Print.printError("Socket error: " + e.getMessage());

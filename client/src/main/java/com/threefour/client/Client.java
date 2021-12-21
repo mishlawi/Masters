@@ -8,13 +8,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.net.UnknownHostException;
 
@@ -23,28 +18,18 @@ import com.beust.jcommander.ParameterException;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.threefour.Constants;
-import com.threefour.client.worker.ClientListener;
-import com.threefour.client.worker.GUI;
+import com.threefour.ott.worker.Listener;
 import com.threefour.ott.worker.PulseChecker;
 import com.threefour.ott.worker.PulseSender;
+import com.threefour.overlay.ClientNode;
 import com.threefour.overlay.Node;
 import com.threefour.util.Args;
-import com.threefour.util.Pair;
 import com.threefour.util.Print;
 import com.threefour.video.VideoFrame;
 
 import org.yaml.snakeyaml.Yaml;
 
 public class Client {
-
-    private static DatagramSocket socket = null;
-    private static Map<InetAddress, Pair<Boolean, Long>> neighbors = new HashMap<>();
-
-    // map locks vizinhos
-
-    private static ReadWriteLock nbReadWriteLock = new ReentrantReadWriteLock();
-    private static Lock nbWriteLock = nbReadWriteLock.writeLock();
-    private static Lock nbReadLock = nbReadWriteLock.readLock();
 
     public static void main(String[] argv) throws SocketException {
 
@@ -64,7 +49,7 @@ public class Client {
             return;
         }
 
-        Print.printInfo("Running OTT...");
+        Print.printInfo("Running client...");
 
         Multimap<String, InetAddress> ns = ArrayListMultimap.create();
 
@@ -95,23 +80,24 @@ public class Client {
         }
 
         Print.printInfo("Parsed neighbours: " + ns);
-        Node neighbours = new Node(ns);
         List<VideoFrame> frame = new ArrayList<>();
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {
 
+            Node node = new ClientNode(frame, socket, ns);
+
             // launch thread to listen to messages
-            new Thread(new ClientListener(frame, socket, neighbours)).start();
+            new Thread(new Listener(node)).start();
 
             // launch thread to send periodic heartbeats
-            new Thread(new PulseSender(socket, neighbours)).start();
+            new Thread(new PulseSender(node)).start();
 
             // launch graphical interface
             new GUI(frame);
 
             // launch thread to manage neighbours' pulses
-            new Thread(new PulseChecker(neighbours)).run();
+            new Thread(new PulseChecker(node)).run();
 
         } catch (SocketException e) {
             Print.printError("Socket error: " + e.getMessage());

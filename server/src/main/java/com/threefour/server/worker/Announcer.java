@@ -1,10 +1,7 @@
 package com.threefour.server.worker;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 
-import com.threefour.Constants;
 import com.threefour.message.Announcement;
 import com.threefour.message.Message;
 import com.threefour.message.Type;
@@ -12,41 +9,26 @@ import com.threefour.overlay.Node;
 
 public class Announcer implements Runnable {
 
-    private DatagramSocket socket;
-    private Node neighbours;
+    private Node node;
 
-    public Announcer(DatagramSocket socket, Node neighbours) {
-        this.socket = socket;
-        this.neighbours = neighbours;
+    public Announcer(Node node) {
+        this.node = node;
     }
 
     @Override
     public void run() {
-        try {
-            var buf = new Message(Type.ANNOUNCEMENT, new Announcement((byte) 0, null).toBytes()).to_bytes();
-            var packet = new DatagramPacket(buf, buf.length);
-            packet.setPort(Constants.PORT);
 
-            while (true) {
-
-                var addresses = neighbours.getActiveAddresses();
-
-                for (var neighbor : addresses) {
-                    packet.setAddress(neighbor);
-                    socket.send(packet);
-                }
-
-                try {
-                    Thread.sleep(Constants.ANNOUNCE_TIME);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
+        while (true) {
+            try {
+                var message = new Message(Type.ANNOUNCEMENT, new Announcement((byte) 0, null).toBytes());
+                this.node.floodAllMessage(message);
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
         }
 
     }

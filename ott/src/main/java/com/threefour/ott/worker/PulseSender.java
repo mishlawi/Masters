@@ -1,57 +1,31 @@
 package com.threefour.ott.worker;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.util.Map;
-import java.util.concurrent.locks.Lock;
 
-import com.threefour.Constants;
 import com.threefour.message.Message;
 import com.threefour.overlay.Node;
-import com.threefour.util.Pair;
-import com.threefour.util.Print;
 
 public class PulseSender implements Runnable {
 
-    private DatagramSocket socket;
+    private Node node;
 
-    private Node neighbours;
-
-    public PulseSender(DatagramSocket socket, Node neighbours) {
-        this.socket = socket;
-        this.neighbours = neighbours;
+    public PulseSender(Node node) {
+        this.node = node;
     }
 
     @Override
     public void run() {
-        try {
 
-            byte[] heartbeat = (new Message()).to_bytes();
-            DatagramPacket packet = new DatagramPacket(heartbeat, heartbeat.length);
-            packet.setPort(Constants.PORT);
-
-            while (socket != null) {
-                this.neighbours.readLock.lock();
-                try {
-                    neighbours.getAllAddresses().forEach(address -> {
-                        packet.setAddress(address);
-                        try {
-                            socket.send(packet);
-                        } catch (IOException e) {
-                            Print.printError("Could not send packet: " + e.getMessage());
-                        }
-                    });
-                } finally {
-                    this.neighbours.readLock.unlock();
-                }
-
-                Thread.sleep(Constants.HEARTBEAT_TIME);
-
+        while (true) {
+            try {
+                this.node.floodAllMessage(Message.MSG_HEARTBEAT);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            Print.printError("Could not send packet: " + e.getMessage());
         }
 
     }

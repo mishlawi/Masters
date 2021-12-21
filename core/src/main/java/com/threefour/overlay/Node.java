@@ -1,33 +1,48 @@
 package com.threefour.overlay;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.threefour.Constants;
+import com.threefour.message.Announcement;
+import com.threefour.message.Message;
+import com.threefour.message.Type;
+import com.threefour.util.Print;
 
 /**
  * Class that contains information about the node state in the overlay.
  */
 public class Node {
 
+    public final DatagramSocket socket;
+
     // mapping to get the name of the host from one of its addresses
     private final ImmutableMultimap<InetAddress, String> ADDRESS_TO_NAME_MAPPING;
 
-    // state of neighbours
+    // state of links with neighbours
     private Map<String, Link> links;
-    public Lock readLock;
-    public Lock writeLock;
+    public Lock rlLinks;
+    public Lock wlLinks;
 
-    public Node(Multimap<String, InetAddress> neighbours) {
+    // route table
+    protected RouteTable routeTable;
+    public Lock rlRoutes;
+    public Lock wlRoutes;
+
+    // main constructor
+    public Node(DatagramSocket socket, Multimap<String, InetAddress> neighbours) {
+        this.socket = socket;
+
         // TODO: there might be a more efficient way to do this
         this.ADDRESS_TO_NAME_MAPPING = new ImmutableListMultimap.Builder<String, InetAddress>()
                 .putAll(neighbours)
@@ -36,29 +51,14 @@ public class Node {
         this.links = Maps.toMap(neighbours.keySet(), key -> new Link(neighbours.get(key)));
 
         ReadWriteLock linksRWLock = new ReentrantReadWriteLock();
-        this.readLock = linksRWLock.writeLock();
-        this.writeLock = linksRWLock.readLock();
-    }
+        this.rlLinks = linksRWLock.readLock();
+        this.wlLinks = linksRWLock.writeLock();
 
-    /**
-     * @return List of the addresses of the active neighbors.
-     */
-    public List<InetAddress> getAllAddresses() {
-        return this.links.values()
-                .stream()
-                .map(link -> link.getAddress())
-                .collect(Collectors.toList());
-    }
+        this.routeTable = null;
 
-    /**
-     * @return List of the addresses of the active neighbors.
-     */
-    public List<InetAddress> getActiveAddresses() {
-        return this.links.values()
-                .stream()
-                .filter(link -> link.isActive())
-                .map(link -> link.getAddress())
-                .collect(Collectors.toList());
+        ReadWriteLock routesRWLock = new ReentrantReadWriteLock();
+        this.rlRoutes = routesRWLock.readLock();
+        this.wlRoutes = routesRWLock.writeLock();
     }
 
     /**
@@ -68,7 +68,12 @@ public class Node {
      * @return Address associated with the given host.
      */
     public InetAddress getAddress(String name) {
-        return this.links.get(name).getAddress();
+        this.rlLinks.lock();
+        try {
+            return this.links.get(name).getAddress();
+        } finally {
+            this.rlLinks.unlock();
+        }
     }
 
     /**
@@ -90,7 +95,12 @@ public class Node {
      * @param name Name of the neighbour.
      */
     public void deactivateLink(String name) {
-        this.links.get(name).deactivateLink();
+        this.wlLinks.lock();
+        try {
+            this.links.get(name).deactivateLink();
+        } finally {
+            this.wlLinks.unlock();
+        }
     }
 
     /**
@@ -100,7 +110,12 @@ public class Node {
      * @param timestamp Timestamp of the last recieved heartbeat.
      */
     public void updateTimestamp(String name, long timestamp) {
-        this.links.get(name).updateTimestamp(timestamp);
+        this.wlLinks.lock();
+        try {
+            this.links.get(name).updateTimestamp(timestamp);
+        } finally {
+            this.wlLinks.unlock();
+        }
     }
 
     /**
@@ -108,15 +123,382 @@ public class Node {
      * timeout has occurred, the link is set as deactivated.
      */
     public void updateLinkStates() {
-        for (var link : this.links.values()) {
-            // if the neighbour is active
-            if (link.isActive() == true) {
-                long gap = System.currentTimeMillis() - link.getTimestamp();
+        this.rlLinks.lock();
+        try {
+            for (var link : this.links.values()) {
+                // if the neighbour is active
+                if (link.isActive() == true) {
+                    long gap = System.currentTimeMillis() - link.getTimestamp();
 
-                if (gap > Constants.TIMEOUT) {
-                    // neighbours.put(address, new Pair<>(false, info.getValue()));
-                    link.deactivateLink();
+                    if (gap > Constants.TIMEOUT) {
+                        this.wlLinks.lock();
+                        try {
+                            link.deactivateLink();
+                        } finally {
+                            this.wlLinks.unlock();
+                        }
+                    }
                 }
+            }
+        } finally {
+            this.rlLinks.unlock();
+        }
+    }
+
+    // --------------------
+    // Message dispatch
+    // --------------------
+
+    /**
+     * Send a message to a specified address.
+     * 
+     * @param address Address of the destination.
+     * @param message Message to be sent.
+     * @throws IOException
+     */
+    public void sendMessage(InetAddress address, Message message) throws IOException {
+        var buf = message.to_bytes();
+        var packet = new DatagramPacket(buf, buf.length, address, Constants.PORT);
+        socket.send(packet);
+    }
+
+    /**
+     * Floods a message to all available neighbours (except parent).
+     * 
+     * @param message Message to be flooded.
+     * @throws IOException
+     */
+    public void floodMessage(Message message) throws IOException {
+
+        var buf = message.to_bytes();
+        var packet = new DatagramPacket(buf, buf.length);
+        packet.setPort(Constants.PORT);
+
+        this.rlLinks.lock();
+        try {
+            this.links.values()
+                    .stream()
+                    .filter(link -> link.isActive())
+                    .map(link -> link.getAddress())
+                    .filter(addr -> !(this.routeTable != null
+                            && this.routeTable.parent.equals(getName(addr))))
+                    .forEach(addr -> {
+                        packet.setAddress(addr);
+                        try {
+                            socket.send(packet);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    });
+        } finally {
+            this.rlLinks.unlock();
+        }
+    }
+
+    /**
+     * Floods a message to all active routes.
+     * 
+     * @param message Message to be flooded.
+     * @throws IOException
+     */
+    public void floodRouteMessage(Message message) throws IOException {
+
+        var buf = message.to_bytes();
+        var packet = new DatagramPacket(buf, buf.length);
+        packet.setPort(Constants.PORT);
+
+        this.rlRoutes.lock();
+        try {
+            this.routeTable.routes.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getValue())
+                    .map(entry -> getAddress(entry.getKey()))
+                    .forEach(addr -> {
+                        packet.setAddress(addr);
+                        try {
+                            socket.send(packet);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    });
+        } finally {
+            this.rlRoutes.unlock();
+        }
+    }
+
+    /**
+     * Floods a message to all neighbours (even the ones with a deactivated link).
+     * 
+     * @param message Message to be flooded.
+     * @throws IOException
+     */
+    public void floodAllMessage(Message message) throws IOException, InterruptedException {
+
+        var buf = message.to_bytes();
+        var packet = new DatagramPacket(buf, buf.length);
+        packet.setPort(Constants.PORT);
+
+        this.rlLinks.lock();
+        try {
+            this.links.values()
+                    .forEach(link -> {
+                        packet.setAddress(link.getAddress());
+                        try {
+                            socket.send(packet);
+                        } catch (IOException e) {
+                            Print.printError("Could not send packet: " + e.getMessage());
+                        }
+                    });
+        } finally {
+            this.rlLinks.unlock();
+        }
+
+        Thread.sleep(Constants.HEARTBEAT_TIME);
+
+    }
+
+    // --------------------
+    // Message processing
+    // --------------------
+
+    /**
+     * Processes an heartbeat message.
+     * 
+     * @param address Address of the sender.
+     */
+    public void heartbeat(InetAddress address) {
+        updateTimestamp(getName(address), System.currentTimeMillis());
+    }
+
+    /**
+     * Processes a server announcement message.
+     * 
+     * @param address      Address of the sender (parent node).
+     * @param announcement Announcement message.
+     */
+    public void announcement(InetAddress address, Announcement announcement) {
+
+        // if the announcement comes directly from the server, its address
+        // needs to be instantiated (because it starts at null, since the
+        // server doesn't put its own address in the announcement)
+        if (announcement.distance() == 0) {
+            announcement = new Announcement((byte) 0, address);
+        }
+        // if the announcement has jumped too many nodes, it is dropped
+        else if (announcement.distance() > Constants.ANNOUNCE_TTL) {
+            return;
+        }
+
+        Print.printInfo(address + ": " + announcement);
+
+        this.rlRoutes.lock();
+        try {
+            // if this is the first announcement
+            if (this.routeTable == null) {
+                // create a new routing table with `address` as parent
+                var server = announcement.server();
+                var parent = getName(address);
+
+                this.wlRoutes.lock();
+                try {
+                    this.routeTable = new RouteTable(server, parent, announcement.distance());
+                } finally {
+                    this.wlRoutes.unlock();
+                }
+
+                try {
+                    // send RT_ADD to parent
+                    sendMessage(address, Message.MSG_RT_ADD);
+                    Print.printInfo(parent + " is the first parent");
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            // if not (and if the distance is shorter)
+            else if (announcement.distance() < this.routeTable.distance) {
+                var hostname = this.getName(address);
+
+                // if the announcement doesn't come from the current parent
+                if (!hostname.equals(this.routeTable.parent)) {
+                    try {
+                        // send current parent RT_DELETE
+                        sendMessage(this.getAddress(this.routeTable.parent), Message.MSG_RT_DELETE);
+                        // send new parent RT_ADD
+                        sendMessage(address, Message.MSG_RT_ADD);
+                        Print.printInfo(address + " is the new parent");
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+
+                this.wlRoutes.lock();
+                try {
+                    this.routeTable.parent = hostname;
+                    this.routeTable.distance = announcement.distance();
+                } finally {
+                    this.wlRoutes.unlock();
+                }
+            }
+        } finally {
+            this.rlRoutes.unlock();
+        }
+
+        // propagate announcement to other neighbours with +1 distance
+        try {
+            this.floodMessage(new Message(Type.ANNOUNCEMENT, announcement.increment().toBytes()));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Processes a route activation message.
+     * 
+     * @param address Address of the sender.
+     */
+    public void activate(InetAddress address) {
+
+        if (this.routeTable != null) {
+
+            // activate child's route
+            var hostname = getName(address);
+            this.wlRoutes.lock();
+            try {
+                this.routeTable.activateRoute(hostname);
+            } finally {
+                this.wlRoutes.unlock();
+            }
+            Print.printInfo("Route to " + hostname + " activated");
+
+            try {
+                // sends activation message to parent
+                this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_ACTIVATE);
+                Print.printInfo("Sent activation message to " + this.routeTable.parent);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    /**
+     * Processes a route deactivation message.
+     * 
+     * @param address Address of the sender.
+     */
+    public void deactivate(InetAddress address) {
+
+        if (this.routeTable != null) {
+
+            // deactivate child's route
+            var hostname = getName(address);
+            this.wlRoutes.lock();
+            try {
+                this.routeTable.deactivateRoute(hostname);
+            } finally {
+                this.wlRoutes.unlock();
+            }
+            Print.printInfo("Route to " + hostname + " deactivated");
+
+            try {
+                // sends deactivation message to parent
+                this.sendMessage(getAddress(this.routeTable.parent), Message.MSG_RT_DEACTIVATE);
+                Print.printInfo("Sent deactivation message to " + this.routeTable.parent);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    /**
+     * Processes a route addition message.
+     * 
+     * @param address Address of the child node that wants to establish a route.
+     */
+    public void add(InetAddress address) {
+        var hostname = getName(address);
+        this.wlRoutes.lock();
+        try {
+            this.routeTable.addRoute(hostname);
+        } finally {
+            this.wlRoutes.unlock();
+        }
+        Print.printInfo("Established route to " + hostname);
+    }
+
+    /**
+     * Processes a route deletion message.
+     * 
+     * @param address Address of the sender.
+     */
+    public void delete(InetAddress address) {
+        if (this.routeTable != null) {
+            // delete child's route
+            var hostname = getName(address);
+            this.wlRoutes.lock();
+            try {
+                this.routeTable.deleteRoute(hostname);
+            } finally {
+                this.wlRoutes.unlock();
+            }
+            Print.printInfo("Route to " + hostname + " deleted");
+        }
+    }
+
+    /**
+     * Processes a route loss message.
+     */
+    public void lost() {
+        if (this.routeTable != null) {
+
+            try {
+                // send lost message to children
+                for (String hostname : this.routeTable.routes.keySet()) {
+                    this.sendMessage(getAddress(hostname), Message.MSG_RT_LOST);
+                    Print.printInfo("Sent lost message to " + hostname);
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            this.wlRoutes.lock();
+            try {
+                // delete route table
+                this.routeTable = null;
+            } finally {
+                this.wlRoutes.unlock();
+            }
+
+        }
+    }
+
+    /**
+     * Processes a data message.
+     */
+    public void data(Message message) {
+        if (this.routeTable != null) {
+            try {
+                // send data to children
+                for (var entry : this.routeTable.routes.entrySet()) {
+                    if (entry.getValue()) {
+                        this.sendMessage(getAddress(entry.getKey()), message);
+                        Print.printInfo("Sent data message to " + entry.getKey());
+                    }
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
     }

@@ -6,25 +6,25 @@ import com.threefour.util.Print;
 
 public class PulseChecker implements Runnable {
 
-    private Node neighbours;
+    private Node node;
 
-    public PulseChecker(Node neighbours) {
-        this.neighbours = neighbours;
+    public PulseChecker(Node node) {
+        this.node = node;
     }
 
     @Override
     public void run() {
-        while (true) {
 
-            this.neighbours.updateLinkStates();
+        while (true) {
+            this.node.updateLinkStates();
 
             try {
                 Thread.sleep(Constants.TIMEOUT);
             } catch (Exception e) {
                 Print.printError("Could not fall asleep: " + e.getMessage());
             }
-
         }
+
     }
 
 }

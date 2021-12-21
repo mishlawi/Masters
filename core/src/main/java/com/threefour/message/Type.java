@@ -11,7 +11,6 @@ public enum Type {
 
     // general types
     HEARTBEAT,
-    USER_INPUT,
     ANNOUNCEMENT,
     DATA,
 

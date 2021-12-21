@@ -17,11 +17,11 @@ import com.beust.jcommander.ParameterException;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.threefour.Constants;
+import com.threefour.ott.worker.Listener;
 import com.threefour.ott.worker.PulseChecker;
 import com.threefour.ott.worker.PulseSender;
-import com.threefour.overlay.Node;
+import com.threefour.overlay.ServerNode;
 import com.threefour.server.worker.Announcer;
-import com.threefour.server.worker.ServerListener;
 import com.threefour.server.worker.Streamer;
 import com.threefour.util.Args;
 import com.threefour.util.Print;
@@ -79,25 +79,26 @@ public class Server {
         }
 
         Print.printInfo("Parsed neighbours: " + ns);
-        Node neighbours = new Node(ns);
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {
 
-            // launch thread to send periodic heartbeats
-            new Thread(new PulseSender(socket, neighbours)).start();
+            ServerNode node = new ServerNode(socket, ns);
 
-            // launch thread to manage neighbours' pulses
-            new Thread(new PulseChecker(neighbours)).start();
+            // launch thread to send periodic heartbeats
+            new Thread(new PulseSender(node)).start();
+
+            // launch thread to manage node' pulses
+            new Thread(new PulseChecker(node)).start();
 
             // launch thread to listen to messages
-            new Thread(new ServerListener(socket, neighbours)).start();
+            new Thread(new Listener(node)).start();
 
             // launch thread to send periodic info
-            new Thread(new Announcer(socket, neighbours)).start();
+            new Thread(new Announcer(node)).start();
 
             // send frames
-            new Streamer(socket, neighbours, args.video).run();
+            new Streamer(node, args.video).run();
 
         } catch (SocketException e) {
             Print.printError("Socket error: " + e.getMessage());
