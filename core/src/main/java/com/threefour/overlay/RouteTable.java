@@ -29,17 +29,20 @@ public class RouteTable {
     }
 
     public void deleteRoute(String hostname) {
+        deactivateRoute(hostname);
         this.routes.remove(hostname);
     }
 
     public void activateRoute(String hostname) {
-        this.routes.replace(hostname, true);
-        this.activeRoutes += 1;
+        if (this.routes.replace(hostname, true).equals(Boolean.FALSE)) {
+            this.activeRoutes += 1;
+        }
     }
 
     public void deactivateRoute(String hostname) {
-        this.routes.replace(hostname, false);
-        this.activeRoutes -= 1;
+        if (this.routes.replace(hostname, false).equals(Boolean.TRUE)) {
+            this.activeRoutes -= 1;
+        }
     }
 
 }
