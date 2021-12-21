@@ -1,4 +1,4 @@
-package com.threefour.server;
+package com.threefour.intermediator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,18 +17,14 @@ import com.beust.jcommander.ParameterException;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.threefour.Constants;
-import com.threefour.intermediator.worker.Listener;
-import com.threefour.intermediator.worker.PulseChecker;
-import com.threefour.intermediator.worker.PulseSender;
-import com.threefour.overlay.ServerNode;
-import com.threefour.server.worker.Announcer;
-import com.threefour.server.worker.Streamer;
+import com.threefour.intermediator.worker.*;
+import com.threefour.overlay.Node;
 import com.threefour.util.Args;
 import com.threefour.util.Print;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class Server {
+public class Intermediator {
 
     public static void main(String[] argv) {
 
@@ -48,7 +44,7 @@ public class Server {
             return;
         }
 
-        Print.printInfo("Running server...");
+        Print.printInfo("Running intermediator...");
 
         Multimap<String, InetAddress> ns = ArrayListMultimap.create();
 
@@ -83,22 +79,16 @@ public class Server {
         // open socket
         try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {
 
-            ServerNode node = new ServerNode(socket, ns);
-
-            // launch thread to send periodic heartbeats
-            new Thread(new PulseSender(node)).start();
-
-            // launch thread to manage node' pulses
-            new Thread(new PulseChecker(node)).start();
+            Node node = new Node(socket, ns);
 
             // launch thread to listen to messages
             new Thread(new Listener(node)).start();
 
-            // launch thread to send periodic info
-            new Thread(new Announcer(node)).start();
+            // launch thread to send periodic heartbeats
+            new Thread(new PulseSender(node)).start();
 
-            // send frames
-            new Streamer(node, args.video).run();
+            // launch thread to manage neighbours' pulses
+            new PulseChecker(node).run();
 
         } catch (SocketException e) {
             Print.printError("Socket error: " + e.getMessage());
@@ -106,5 +96,4 @@ public class Server {
         }
 
     }
-
 }

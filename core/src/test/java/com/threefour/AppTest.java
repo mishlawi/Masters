@@ -8,7 +8,7 @@ import java.net.InetAddress;
 import java.util.Arrays;
 
 import com.threefour.message.Announcement;
-import com.threefour.video.Frame;
+import com.threefour.video.VideoFrame;
 
 import org.junit.Test;
 
@@ -41,8 +41,8 @@ public class AppTest {
     @Test
     public void frameIsTheSameAfterSerialization() {
         try {
-            var before = new Frame(10, new byte[] { 13, 42 });
-            var after = Frame.fromBytes(before.toBytes());
+            var before = new VideoFrame(10, new byte[] { 13, 42 });
+            var after = VideoFrame.fromBytes(before.toBytes());
             assertTrue("Frame is different after serialization",
                     before.frameNum() == after.frameNum() && Arrays.equals(before.data(), after.data()));
         } catch (IOException e) {

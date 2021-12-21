@@ -2,28 +2,22 @@ package com.threefour.server.worker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.util.Set;
 
-import com.threefour.Constants;
 import com.threefour.message.Message;
 import com.threefour.message.Type;
+import com.threefour.overlay.Node;
 import com.threefour.util.Print;
-import com.threefour.video.Frame;
+import com.threefour.video.VideoFrame;
 import com.threefour.video.Video;
 
 public class Streamer implements Runnable {
 
-    private DatagramSocket socket;
-    private Set<InetAddress> neighbors;
+    private Node node;
 
     private String filename;
 
-    public Streamer(DatagramSocket socket, Set<InetAddress> neighbors, String filename) {
-        this.socket = socket;
-        this.neighbors = neighbors;
+    public Streamer(Node node, String filename) {
+        this.node = node;
         this.filename = filename;
     }
 
@@ -39,11 +33,14 @@ public class Streamer implements Runnable {
             return;
         }
 
-        while (!video.hasEnded()) {
-            // TODO if it has reached the end, loop back to the beginning
+        while (true) {
+
+            if (video.hasEnded()) {
+                video.reset();
+            }
 
             // read frame
-            Frame frame;
+            VideoFrame frame;
             try {
                 frame = video.getNextFrame();
             } catch (IOException e) {
@@ -53,14 +50,8 @@ public class Streamer implements Runnable {
 
             // send frame
             try {
-                var message = new Message(Type.DATA, frame.toBytes()).to_bytes();
-                var packet = new DatagramPacket(message, message.length);
-                packet.setPort(Constants.PORT);
-
-                for (var addr : neighbors) {
-                    packet.setAddress(addr);
-                    socket.send(packet);
-                }
+                var message = new Message(Type.DATA, frame.toBytes());
+                this.node.floodRouteMessage(message);
             } catch (IOException e) {
                 Print.printError("Could not send frame: " + e.getMessage());
             }

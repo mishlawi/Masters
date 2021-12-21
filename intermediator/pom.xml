@@ -9,12 +9,12 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ott</artifactId>
+  <artifactId>intermediator</artifactId>
   <groupId>com.threefour</groupId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>ott</name>
+  <name>intermediator</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -45,7 +45,7 @@
               <configuration>
                 <archive>
                   <manifest>
-                    <mainClass>com.threefour.ott.Ott</mainClass>
+                    <mainClass>com.threefour.intermediator.Intermediator</mainClass>
                   </manifest>
                 </archive>
                 <descriptorRefs>

@@ -31,11 +31,32 @@
       <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- https://github.com/google/guava -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>31.0.1-jre</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
+    <dependency>
+      <groupId>com.beust</groupId>
+      <artifactId>jcommander</artifactId>
+      <version>1.81</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.30</version>
+    </dependency>
   </dependencies>
 
   <modules>
     <module>core</module>
-    <module>ott</module>
+    <module>intermediator</module>
     <module>server</module>
     <module>client</module>
   </modules>

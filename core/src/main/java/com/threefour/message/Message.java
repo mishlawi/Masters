@@ -9,7 +9,6 @@ import java.nio.ByteBuffer;
 
 public class Message {
 
-    // TODO: add version
     // Message's type
     public final Type type;
     // Message's payload

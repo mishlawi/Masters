@@ -1,4 +1,4 @@
-package com.threefour.server;
+package com.threefour.client;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,10 +7,11 @@ import java.io.InputStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.net.UnknownHostException;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -20,17 +21,17 @@ import com.threefour.Constants;
 import com.threefour.intermediator.worker.Listener;
 import com.threefour.intermediator.worker.PulseChecker;
 import com.threefour.intermediator.worker.PulseSender;
-import com.threefour.overlay.ServerNode;
-import com.threefour.server.worker.Announcer;
-import com.threefour.server.worker.Streamer;
+import com.threefour.overlay.ClientNode;
+import com.threefour.overlay.Node;
 import com.threefour.util.Args;
 import com.threefour.util.Print;
+import com.threefour.video.VideoFrame;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class Server {
+public class Client {
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws SocketException {
 
         // parse arguments
         var args = new Args();
@@ -48,7 +49,7 @@ public class Server {
             return;
         }
 
-        Print.printInfo("Running server...");
+        Print.printInfo("Running client...");
 
         Multimap<String, InetAddress> ns = ArrayListMultimap.create();
 
@@ -79,26 +80,24 @@ public class Server {
         }
 
         Print.printInfo("Parsed neighbours: " + ns);
+        List<VideoFrame> frame = new ArrayList<>();
 
         // open socket
         try (DatagramSocket socket = new DatagramSocket(Constants.PORT)) {
 
-            ServerNode node = new ServerNode(socket, ns);
-
-            // launch thread to send periodic heartbeats
-            new Thread(new PulseSender(node)).start();
-
-            // launch thread to manage node' pulses
-            new Thread(new PulseChecker(node)).start();
+            Node node = new ClientNode(frame, socket, ns);
 
             // launch thread to listen to messages
             new Thread(new Listener(node)).start();
 
-            // launch thread to send periodic info
-            new Thread(new Announcer(node)).start();
+            // launch thread to send periodic heartbeats
+            new Thread(new PulseSender(node)).start();
 
-            // send frames
-            new Streamer(node, args.video).run();
+            // launch graphical interface
+            new GUI(frame);
+
+            // manage neighbours' pulses
+            new PulseChecker(node).run();
 
         } catch (SocketException e) {
             Print.printError("Socket error: " + e.getMessage());
@@ -106,5 +105,4 @@ public class Server {
         }
 
     }
-
 }
