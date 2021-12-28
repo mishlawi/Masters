@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS= -g -O3
+CFLAGS= -g -O2
 DEPS =
-OBJ = parallelBucketSort.o
+OBJ = main.o
 LIB = -fopenmp
 
 %.o: %.c $(DEPS)
