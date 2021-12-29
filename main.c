@@ -45,22 +45,39 @@ final array:
 #include <stdlib.h>
 #include <time.h>
 
-# define BUCKETS 5
+
 # define CAP 10
+
+int B; // * buckets
+int min;
+int max;
+
 /* 
-maybe get a user defined array
-or generate it in a random way <----
-we need to define de bucket vector:
-we need a bucket vector
-*/
-struct bucket
+ maybe get a user defined array
+* or generate it in a random way <----
+! we need to define the bucket vector:
+   * we need a bucket
+   * and then an array of BUCKETS each having its own bucket list
+*/  
+
+
+// Bucket 
+
+struct Bucket
 {
     int value;
-    struct bucket;
-
+    struct Bucket *prox;
 };
 
 
+/**
+ * @brief Get a random number in a specific interval
+ * 
+ * @param low 
+ * @param up 
+ * @param N 
+ * @return int 
+ */
 int getRand(int low, int up, int N)
 { 
 
@@ -68,39 +85,101 @@ int getRand(int low, int up, int N)
     return nrGen;
 }
 
+
+
+/**
+ * @brief Get the Rand Array object
+ * 
+ * @param low 
+ * @param up 
+ * @param number 
+ * @return int* 
+ */
 int * getRandArray(int low, int up, int number){
-
-    int r[number];
+   // char *str_to_ret = malloc(sizeof(char) * required_size);
+    int *r = malloc(sizeof(int)*number);
     int i;
-    srand((unsigned)time(NULL));
 
-    for (i = 0; i < number; ++i)
+
+    srand((unsigned)time(NULL));
+    r[0] = getRand(low,up,number);
+    min = r[0];
+    max = min;
+    printf("r[0] = %d\n", r[0]);
+    for (i = 1; i < number; ++i)
     {
         
         r[i] = getRand(low,up,number);
+        if(min > r[i]) {
+            min = r[i];
+        }
+        if(max < r[i]) {
+            max = r[i];
+        }
         printf("r[%d] = %d\n", i, r[i]);
     }
+    //free(r);
+    printf("%d\n", min);
+    printf("%d\n", max);
+    // ! dont forget to understand all the concepts of malloc and free
+    // TODO ->  Add free(r) de forma conveniente
     
     return r;
 }
-
-
-
-
-
-int main(int argc,char *argv[]){
+/*
+void initB(struct Bucket ** buckets)
+{
     
-    if( argc>4 || argc==1){
-        printf("*Lacking arguments\n\n./main [inf. range of values] [sup. range of values] [Nr of elements in the array] \n");
-        return 1;
+
+    // Create buckets and allocate memory size
+    buckets = (struct Bucket **)malloc(sizeof(struct Node *) * B);
+
+    // Initialize empty buckets
+    for (int i = 0; i < B; ++i)
+    {
+        buckets[i] = NULL;
     }
     
+}
+*/
+int main(int argc, char *argv[])
+{
+
+    if (argc != 5)
+    {
+        printf("*Lacking or overgiving arguments\n\n./main [inf. range of values] [sup. range of values] [Nr of elements in the array] [Nr of B] \n");
+        return 1;
+    }
     int low = atoi(argv[1]);
     int up = atoi(argv[2]);
     int N = atoi(argv[3]);
+    B = atoi(argv[4]);
     int *arr;
 
-    arr = getRandArray(low,up,N);
+    arr = getRandArray(low, up, N);
+    int range;
+    range = (max - min) / B+1;
+
+    printf("Range de cada bucket: %d\n", range); // TODO: eliminar estes comentarios
+    struct Bucket **buckets;
     
+    
+    int index;
+    // where the sorting in different buckets happens
+    for (int i = 0; i < N; i++){
+        index = (arr[i]-min)/range;
+        printf("Bucket nr:%d\n",index);
+        
+
+       /*
+        if(*bucket[index]==NULL){
+            bucket[index].value=arr[i];
+            struct Bucket* newNode = (struct Bucket *)malloc(sizeof(struct Bucket));
+            bucket[index].prox= newNode;
+            newNode->prox=NULL;
+        }
+        */
+    }
+
     return 0;
-} 
+}
