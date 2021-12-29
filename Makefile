@@ -1,14 +1,17 @@
-CC=gcc
-CFLAGS= -g -O2
-DEPS =
-OBJ = main.o
-LIB = -fopenmp
+CC      = gcc
+CFLAGS  = -g
+RM      = rm -f
 
-%.o: %.c $(DEPS)
-	$(CC) $(CFLAGS) -c -o $@ $< $(LIB)
 
-parallelBucketSort: $(OBJ)
-	gcc $(CFLAGS) -o $@ $^ $(LIB)
+default: all
 
-clean:
-	rm *.o parallelBucketSort
+all: Main
+
+Main: main.c
+	$(CC) $(CFLAGS) -o main  main.c
+
+
+
+
+clean veryclean:
+	$(RM) main
