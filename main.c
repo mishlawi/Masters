@@ -1,13 +1,7 @@
-/**
- * @file main.c
- * @author mishlawi
- * @brief 
- * @version 0.1
- * @date 2021-12-10
- * 
- * @copyright Copyright (c) 2021
- * 
- */
+#include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 /*
 In order to use OpenMP’s directives, we will have to include the header file: "omp.h".
@@ -40,35 +34,31 @@ final array:
 12 ; 14 ; 15 ; 24 ; 34 ; 35 ; 65 ; 75 ; 81 ; 87;
 */
 
-#include <omp.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
 
 # define CAP 10
 
 int B; // * buckets
-int min;
-int max;
+int min; // * min value of the input array
+int max; // * max value of the input array
 
 /* 
  maybe get a user defined array
 * or generate it in a random way <----
 ! we need to define the bucket vector:
-   * we need a bucket
-   * and then an array of BUCKETS each having its own bucket list
+   * an array of BUCKETS each having its own bucket list
+   ? maybe an array of buckets instead of a list ?
 */  
 
 
 // Bucket 
+
 
 struct Bucket
 {
     int value;
     struct Bucket *prox;
 };
-
 
 /**
  * @brief Get a random number in a specific interval
@@ -88,7 +78,7 @@ int getRand(int low, int up, int N)
 
 
 /**
- * @brief Get the Rand Array object
+ * @brief Get the array with random values
  * 
  * @param low 
  * @param up 
@@ -126,28 +116,42 @@ int * getRandArray(int low, int up, int number){
     
     return r;
 }
-/*
-void initB(struct Bucket ** buckets)
+
+struct Bucket ** initBuckets(int size)
 {
-    
-
-    // Create buckets and allocate memory size
-    buckets = (struct Bucket **)malloc(sizeof(struct Node *) * B);
-
-    // Initialize empty buckets
-    for (int i = 0; i < B; ++i)
-    {
-        buckets[i] = NULL;
+    struct Bucket **buckets;
+    buckets = (struct Bucket **)malloc(sizeof(struct Bucket *) * size);
+    for(int i=0;i<size;i++){
+        buckets[i]=NULL;
     }
     
+return buckets;
 }
-*/
+
+void printBuckets(struct Bucket **buckets,int size){
+    printf("*******************\n");
+    for (int i=0;i<size;i++){
+        printf("No bucket %d há:\n", i );
+        if(buckets[i]!=NULL){
+            printf(".%d\n",buckets[i]->value);
+            struct Bucket *atm = buckets[i];
+            while(atm->prox!=NULL){
+                printf(".%d\n",atm->prox->value);
+                atm=atm->prox;
+            }
+        }
+        
+       
+    }
+
+}
+
 int main(int argc, char *argv[])
 {
 
     if (argc != 5)
     {
-        printf("*Lacking or overgiving arguments\n\n./main [inf. range of values] [sup. range of values] [Nr of elements in the array] [Nr of B] \n");
+        printf("*Lacking or overgiving arguments\n\n./main [valor inferior] [valor superior] [nr elementos array] [nr de buckets] \n");
         return 1;
     }
     int low = atoi(argv[1]);
@@ -156,30 +160,41 @@ int main(int argc, char *argv[])
     B = atoi(argv[4]);
     int *arr;
 
-    arr = getRandArray(low, up, N);
+    arr = getRandArray(low, up, N); // generates the array with random elements
+   
     int range;
     range = (max - min) / B+1;
 
     printf("Range de cada bucket: %d\n", range); // TODO: eliminar estes comentarios
-    struct Bucket **buckets;
     
-    
+ 
     int index;
-    // where the sorting in different buckets happens
-    for (int i = 0; i < N; i++){
-        index = (arr[i]-min)/range;
-        printf("Bucket nr:%d\n",index);
-        
-
-       /*
-        if(*bucket[index]==NULL){
-            bucket[index].value=arr[i];
-            struct Bucket* newNode = (struct Bucket *)malloc(sizeof(struct Bucket));
-            bucket[index].prox= newNode;
-            newNode->prox=NULL;
+     // * array of buckets
+    struct Bucket **buckets = initBuckets(B);
+        // ! where the sorting of the values to different buckets happens
+        for (int i = 0; i < N; i++)
+        {
+            struct Bucket *new = (struct Bucket *)malloc(sizeof(struct Bucket *));
+            index = (arr[i] - min) / range;          
+            if (buckets[index] == NULL)
+            {
+                printf("O %d entrou no Bucket nr:%d\n", arr[i], index);
+                new->value = arr[i];
+                new->prox= NULL;
+                buckets[index]= new;                
+            }   
+            else
+            {
+                printf("O %d entrou no Bucket com elementos nr:%d\n", arr[i], index);
+                struct Bucket *atm = buckets[index];
+                
+                while (atm->prox != NULL)  atm = atm->prox;
+                
+                atm->prox = (struct Bucket *)malloc(sizeof(struct Bucket *));
+                atm->prox->value = arr[i];
+                atm->prox->prox = NULL;
+            }
         }
-        */
+        printBuckets(buckets,B);
+         return 0;
     }
-
-    return 0;
-}
