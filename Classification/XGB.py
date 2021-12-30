@@ -1,10 +1,10 @@
-
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import mean_absolute_error
-from sklearn.impute import SimpleImputer
+from xgboost import XGBClassifier
+from sklearn.model_selection import train_test_split
 
 
 from sklearn.preprocessing import LabelEncoder
@@ -12,6 +12,9 @@ import funcoes_auxiliares as fa
 from datetime import datetime
 import random
 
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import StratifiedKFold
 
 
 training = pd.read_csv('training_data.csv', encoding='latin')
@@ -56,35 +59,33 @@ training["LUMINOSITY"]  = LabelEncoder().fit_transform(training[["LUMINOSITY"]])
 test["LUMINOSITY"] = LabelEncoder().fit_transform(test[["LUMINOSITY"]])
 
 
+y = training.AVERAGE_SPEED_DIFF.to_frame()
+x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 
-y = training['AVERAGE_SPEED_DIFF'].to_frame()
-x = training.drop('AVERAGE_SPEED_DIFF', axis=1)
-
-
-rf_model = RandomForestClassifier(random_state=95)
-rf_model.fit(x, y)
+model = XGBClassifier(n_estimators = 120, learning_rate=0.1, criterion='friedman_mse',max_depth=5)
 
 
-rf_predictions = rf_model.predict(test)
+xgbr_model.fit(x, y)
 
 
-rf_predictions = pd.DataFrame(rf_predictions, columns=['Speed_Diff'])
-rf_predictions.index.name='RowId'
-rf_predictions.index += 1 
-rf_predictions.to_csv("./predictions/predictionsGuerra"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
+'''
 
 
+n_estimators = [120,150,180]
+learning_rate = [0.1]
+criterion = ['friedman_mse']
+max_depth = [5]
+param_grid = dict(n_estimators=n_estimators,learning_rate=learning_rate,criterion=criterion,max_depth=max_depth)
+kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=7)
+grid_search = GridSearchCV(model, param_grid, scoring="neg_log_loss", n_jobs=-1, cv=kfold)
+grid_result = grid_search.fit(x, y)
+# summarize results
+print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+means = grid_result.cv_results_['mean_test_score']
+stds = grid_result.cv_results_['std_test_score']
+params = grid_result.cv_results_['params']
 
-
-
-
-
-
-
-
-
-
-
+'''
 
 
 
@@ -92,6 +93,25 @@ rf_predictions.to_csv("./predictions/predictionsGuerra"+ str(datetime.now().strf
 
 
 
+
+
+
+
+
+
+
+
+
+
+"""
+xgbr_predictions = xgbr_model.predict(test)
+
+
+xgbr_predictions = pd.DataFrame(xgbr_predictions, columns=['Speed_Diff'])
+xgbr_predictions.index.name='RowId'
+xgbr_predictions.index += 1 
+xgbr_predictions.to_csv("./predictions/predictionsXGB"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
+"""
 
 
 
