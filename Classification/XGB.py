@@ -8,7 +8,6 @@ from sklearn.model_selection import train_test_split
 
 
 from sklearn.preprocessing import LabelEncoder
-import funcoes_auxiliares as fa
 from datetime import datetime
 import random
 
@@ -62,15 +61,18 @@ test["LUMINOSITY"] = LabelEncoder().fit_transform(test[["LUMINOSITY"]])
 y = training.AVERAGE_SPEED_DIFF.to_frame()
 x = training.drop(['AVERAGE_SPEED_DIFF'], axis=1)
 
+x_test = test
+
+
 model = XGBClassifier(n_estimators = 120, learning_rate=0.1, criterion='friedman_mse',max_depth=5)
 
 
-xgbr_model.fit(x, y)
+model.fit(x, y)
+
+y_test = model.predict(x_test)
 
 
 '''
-
-
 n_estimators = [120,150,180]
 learning_rate = [0.1]
 criterion = ['friedman_mse']
@@ -84,34 +86,14 @@ print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
 means = grid_result.cv_results_['mean_test_score']
 stds = grid_result.cv_results_['std_test_score']
 params = grid_result.cv_results_['params']
-
 '''
 
 
+y_test = pd.DataFrame(y_test, columns=['Speed_Diff'])
+y_test.index.name='RowId'
+y_test.index += 1 
+y_test.to_csv("./predictions/predictionsXGB"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-xgbr_predictions = xgbr_model.predict(test)
-
-
-xgbr_predictions = pd.DataFrame(xgbr_predictions, columns=['Speed_Diff'])
-xgbr_predictions.index.name='RowId'
-xgbr_predictions.index += 1 
-xgbr_predictions.to_csv("./predictions/predictionsXGB"+ str(datetime.now().strftime("%Y-%m-%d %H-%M"))+".csv")
-"""
 
 
 
