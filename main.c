@@ -121,7 +121,7 @@ struct Bucket ** initBuckets(int size)
 {
     struct Bucket **buckets;
     buckets = (struct Bucket **)malloc(sizeof(struct Bucket *) * size);
-    for(int i=0;i<size;i++){
+    for(int i=0; i<size;i++){
         buckets[i]=NULL;
     }
     
@@ -144,6 +144,38 @@ void printBuckets(struct Bucket **buckets,int size){
        
     }
 
+}
+struct Bucket * sortBucket(struct Bucket *bucket, int x){
+    struct Bucket *b1, *b2, *p;
+    b1 = NULL;
+    b2 = bucket;
+    /* b2 points to first node */
+    for (; b2->value < x; b2 = b2->prox)
+    {
+        b1 = b2;
+        if (b2->prox == NULL)
+        {
+            b2 = b2->prox;
+            /* b2 set to NULL */
+            break;
+            /* insert new node at end */
+        }
+    }
+    /* key node found */
+    p = (struct Bucket *)malloc(sizeof(struct Bucket));
+    /* space for new node */
+    p->value = x;
+    /* place value in the new node */
+    p->prox = b2;
+    /* link new node to key node */
+    if (b1 == NULL){
+        bucket = p;
+    }
+    /* new node becomes the first node */
+     else{
+        b1->prox = p;}
+    /* new node inserted after 1st node */
+    return bucket;
 }
 
 int main(int argc, char *argv[])
@@ -185,6 +217,8 @@ int main(int argc, char *argv[])
             }   
             else
             {
+                sortBucket(buckets[index],arr[i]);
+                /*
                 printf("O %d entrou no Bucket com elementos nr:%d\n", arr[i], index);
                 struct Bucket *atm = buckets[index];
                 
@@ -193,6 +227,8 @@ int main(int argc, char *argv[])
                 atm->prox = (struct Bucket *)malloc(sizeof(struct Bucket *));
                 atm->prox->value = arr[i];
                 atm->prox->prox = NULL;
+                */
+               
             }
         }
         printBuckets(buckets,B);
