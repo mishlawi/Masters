@@ -12,53 +12,34 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
+import plotly.express as px
 
 
 df = pd.read_csv("Clus_BuddyMove.csv")
 
-cols = df.columns
-
-def get_greater_index(row):
-    index = 1
-    j = 1
-    bigger = 0
-    for elem in row[1:]:
-        if bigger < elem:
-            bigger = elem
-            index = j
-        j += 1
-        #print(elem)
-    return cols[index]
-
-
-greater = []
-for i in range(len(df)):
-    row = df.iloc[i].to_list()
-    greater.append(get_greater_index(row))
-        
-df['Most_Probably'] = greater
-
-
-
 X=df.drop('User Id', axis=1)
-X=X.drop('Most_Probably', axis=1)
 
 scaler = MinMaxScaler()
 scaler.fit(X)
 X=scaler.transform(X)
 
 
-df.iloc[1].to_list()
-
-'''
-for column in df.columns[2:]:
-    print(len(df[df.Sports > df[column]]))
-'''
-
 model = KMeans(n_clusters=3)
 model.fit(X)
 model.labels_
 y_clusters = model.predict(X)
+
+
+clusters=pd.DataFrame(X,columns=df.drop("User Id",axis=1).columns)
+clusters['label']=model.labels_
+polar=clusters.groupby("label").mean().reset_index()
+polar=pd.melt(polar,id_vars=["label"])
+fig4 = px.line_polar(polar, r="value", theta="variable", color="label", line_close=True,height=800,width=1400)
+fig4.show()
+
+pie=clusters.groupby('label').size().reset_index()
+pie.columns=['label','value']
+px.pie(pie,values='value',names='label',color=['blue','red','green'])
 
 x = X
 y = y_clusters
@@ -69,20 +50,3 @@ rf.fit(x_train,y_train)
 y_pred = rf.predict(x_test)
 
 print(f'accuracy: {accuracy_score(y_test, y_pred)}')
-
-
-'''
-clusters = unique(yhat)
-
-accum=0
-for cluster in clusters:
-    row_ix = where(yhat == cluster)
-    #print(len(row_ix[0]))
-    accum += len(row_ix[0])
-
-output = df.Most_Probably.value_counts()
-
-classification_report(LabelEncoder().fit_transform(df[['Most_Probably']]), yhat)
-# show the plot
-pyplot.show()
-'''
