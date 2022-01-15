@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include<omp.h>
+
 
 #define QTS_NUMEROS 20000000
-#define QTS_BUCKETZ 10
+#define QTS_BUCKETZ 10  
 #define INTERVAL (RAND_MAX/QTS_BUCKETZ)  
 #define COLUNAS (QTS_NUMEROS/QTS_BUCKETZ)*2
 
@@ -53,12 +53,6 @@ int main(int argc, char *argv[]){
     for (i = 0; i < QTS_BUCKETZ; i++) //meter cada gajo do array  preenchidos a 0
         array_de_preenchidos[i] = 0;
 
-    // eu aqui quero que cada thread tenha o seu aux, o seu k, o seu jaka 
-   //#pragma omp parallel for num_threads(QTS_BUCKETZ) private(aux,k,jaka)
-
-
-   //aqui vimos que schedule static era melhor que dynamic e for num threads private
-   #pragma omp for schedule(static)
    for (i = 0; i < QTS_NUMEROS; i++){ 
         aux=rand();
         k=0;
@@ -67,16 +61,10 @@ int main(int argc, char *argv[]){
             k++;
             jaka=jaka+INTERVAL;
         }
-        // aqui tem que ser critical ou single as duas linhas! aqui chegou se a conclusao que 
-        //ter o critical e mais rapido sem o critical....
-        #pragma omp critical
-        {
-            matriz[k][array_de_preenchidos[k]]=aux;
-            array_de_preenchidos[k]++;
-        }
-         
-    }
 
+        matriz[k][array_de_preenchidos[k]]=aux;
+        array_de_preenchidos[k]++;
+    }
 
 
 
@@ -94,7 +82,7 @@ int main(int argc, char *argv[]){
     */
 
     //QUICKSORT A TODOS OS BUCKETS
-    #pragma omp parallel for num_threads(QTS_BUCKETZ)
+
     for (i = 0; i < QTS_BUCKETZ; i++)
         quicksort(matriz[i],0,array_de_preenchidos[i]-1);
     
@@ -102,7 +90,6 @@ int main(int argc, char *argv[]){
 
 
        ///////////////COMEÇAR A PREENCHER O ARRAY/////////////////////
-
 
     int* vector_final = (int*) malloc(sizeof(int) * QTS_NUMEROS);
     k=0;
@@ -139,7 +126,7 @@ int main(int argc, char *argv[]){
 
 
 
-    // LER O ARRAY.TXT e VERIFICAR
+    // LER O ARRAY.TXT
     /*
     FILE *fp;
     int vector_check[137550];
@@ -156,14 +143,14 @@ int main(int argc, char *argv[]){
     }
   fclose(fp);
 
-  k=0;
   for(i=0; i<137550; i++)
     if(vector_final[i]!=vector_check[i])
-        k++;
-
-  printf("encontrados %d numeros errados",k);
-    
+        printf("encontrado um numero errado");
     */
+
+
+
+
 
 
 
