@@ -1,7 +1,7 @@
 from cryptography.hazmat.primitives import hashes 
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-import cryptography
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+import cryptography
 import hmac
 import hashlib
 

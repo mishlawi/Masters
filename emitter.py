@@ -1,5 +1,4 @@
 import os
-import cryptography
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -30,10 +29,6 @@ class Emitter:
         ct = aesgcm.encrypt(nonce, message, metadata)
 
         return digest + nonce + self.key_salt + ct
-
-em = Emitter()
-em.derivate_key()
-#print(str(em.send_message('oiiiiiii'),('utf-8')))
 
 
 

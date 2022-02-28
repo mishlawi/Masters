@@ -1,5 +1,3 @@
-import os
-import time
 from emitter import Emitter
 from receiver import Receiver
 
