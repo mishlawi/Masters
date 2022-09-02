@@ -11,3 +11,6 @@ projeto pratico daa 2021/2022
 
 ### Made by me and war
 You should be capable of compilling the program by using `make` and then `./main`
+
+# ESR
+2021/2022

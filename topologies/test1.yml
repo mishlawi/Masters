@@ -1,0 +1,16 @@
+---
+- name: "n1"
+  addresses:
+    - "10.0.2.1"
+    - "10.0.1.1"
+    - "10.0.0.1"
+- name: "n2"
+  addresses:
+    - "10.0.0.20"
+- name: "n3"
+  addresses:
+    - "10.0.1.20"
+- name: "n4"
+  addresses:
+    - "10.0.2.10"
+
