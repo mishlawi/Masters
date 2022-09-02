@@ -11,12 +11,12 @@ Realizado com:
 
 ## Computação Paralela
 Projeto prático
-
+> You should be capable of compilling the program by using `make` and then `./main`
 
 Realizado com 
 * António Guerra
 
-> You should be capable of compilling the program by using `make` and then `./main`
+
 
 ## ESR
 
