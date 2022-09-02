@@ -1,16 +1,24 @@
 # Masters
-Mestrado Integrado 2021/2022
+Mestrado Integrado ano letivo 2021/2022
 
-# daa
-projeto pratico daa 2021/2022
+## DAA
+Projeto prático
+
+Realizado com:
+* [Melânia Pereira](https://github.com/melpereira7)
+* [Tiago Barata](https://github.com/tiagomqbarata)
+* António Guerra
+
+## Computação Paralela
+Projeto prático
 
 
-# CParalela
+Realizado com 
+* António Guerra
 
-## Paralell computing 2021/2022 project 
+> You should be capable of compilling the program by using `make` and then `./main`
 
-### Made by me and war
-You should be capable of compilling the program by using `make` and then `./main`
+## ESR
 
-# ESR
-2021/2022
+[Ana Sofia](https://github.com/anasofiagif)
+[Rui Ribeiro](https://github.com/ruiasribeiro)
