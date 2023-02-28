@@ -11,14 +11,33 @@ Realizado com:
 
 ## Computação Paralela
 Projeto prático
+
 > You should be capable of compilling the program by using `make` and then `./main`
 
-Realizado com 
+Realizado com:
 * [António Guerra](https://github.com/ribontone)
 
 
+## ESR 
+Projeto prático
 
-## ESR
+Realizado com:
+* [Ana Sofia](https://github.com/anasofiagif)
+* [Rui Ribeiro](https://github.com/ruiasribeiro)
 
-[Ana Sofia](https://github.com/anasofiagif)
-[Rui Ribeiro](https://github.com/ruiasribeiro)
+
+# Perfis de especialização:
+
+## Criptografia e Segurança:
+
+### EC - Estruturas Criptográficas
+
+Realizado com:
+* [Melânia Pereira](https://github.com/melpereira7)
+
+
+### TS - Tecnologias de Segurança
+
+* [Melânia Pereira](https://github.com/melpereira7)
+* [António Guerra](https://github.com/ribontone)
+
