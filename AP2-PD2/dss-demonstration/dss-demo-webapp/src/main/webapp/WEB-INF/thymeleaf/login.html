@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout_auth.html}"
+      th:with="currentPage=#{label.login}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<body>
+<div layout:fragment="content">
+    <form th:action="@{/login}" method="post">
+
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">
+                <span th:text="#{label.to.sign.username}"></span>
+            </label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control input-sm" autocomplete="yes" name="username" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label" >
+                <span th:text="#{label.to.sign.password}"></span>
+            </label>
+            <div class="col-sm-5">
+                <input type="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$" class="form-control input-sm" autocomplete="off" name="password"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="offset-sm-3 col-sm-9">
+                <button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.submit}" ></button>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">
+            </label>
+            <div class="col-sm-5">
+                <a href="signup">Click to Sign Up</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+<div layout:fragment="scripts">
+    <script type="text/javascript">
+        $('[data-toggle="tooltip"]').tooltip();
+    </script>
+</div>
+</body>
+</html>

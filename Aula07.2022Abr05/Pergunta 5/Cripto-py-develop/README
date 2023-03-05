@@ -1,0 +1,60 @@
+###############################################################################
+# eVotUM - Electronic Voting System
+#
+# README
+#
+# README file with the information to install and use the eVotUM python module
+#
+#
+# Copyright (c) 2016 Universidade do Minho
+# José Pina Miranda - Devise Futures, Lda. (jose.miranda@devisefutures.com)
+#
+# Reviewed and tested @Jan/2021 by
+#      José Miranda - Devise Futures, Lda. (jose.miranda@devisefutures.com)
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+###############################################################################
+
+eVotUM.Cripto setup
+
+A. Before installing the required python modules (see requirements.txt), please make
+sure that the following dependencies have been installed:
+
+For Debian and Ubuntu, the following command will ensure that the required dependencies are installed:
+$ sudo apt-get install build-essential libssl-dev libffi-dev python3-dev cargo
+
+For Fedora and RHEL-derivatives, the following command will ensure that the required dependencies are installed:
+$ sudo yum install gcc libffi-devel python3-devel openssl-devel cargo
+
+
+B. Since random numbers are generated using eVotUM.Cripto and several systems are not able
+to generate the necessary entropy (especially in Shamir Secret Sharing functions)
+for /dev/random, please install haveged (http://www.issihosts.com/haveged/index.html)
+before running eVotUM.Cripto.
+
+For Debian and Ubuntu, the following command will ensure that haveged is installed:
+$ sudo apt-get install haveged
+
+For Fedora and RHEL-derivatives, the following command will ensure that haveged is installed:
+$ sudo yum install haveged
+
+
+C. To install the eVotUM.Cripto python module, please follow the following steps:
+  1. Please run the following command: 'python3 setup.py build'.
+  2. Please run the following command: 'sudo python3 setup.py install'.
+
+If you run into the error "ModuleNotFoundError: No module named 'setuptools_rust'", please 
+run the following command: 'sudo pip3 install setuptools-rust'.

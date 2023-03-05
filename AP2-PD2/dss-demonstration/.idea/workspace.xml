@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8426f177-3450-4889-b6f1-b1564fb90527" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/layout_auth.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/config/DSSBeanConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/config/DSSBeanConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/config/WebSecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/config/WebSecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/controller/CMDSignatureController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/controller/CMDSignatureController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/controller/LoginController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/controller/SignatureController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/controller/SignatureController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/controller/SignaturePdfController.java" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/controller/SignaturePdfController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/controller/UserController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/java/eu/europa/esig/dss/web/model/Login.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/resources/i18n/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/resources/i18n/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/cmd-signature.html" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/cmd-signature.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/fragment/fields.html" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/fragment/fields.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/fragment/menu.html" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/fragment/menu.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dss-demo-webapp/src/main/webapp/WEB-INF/thymeleaf/success.jsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2AqQ6E4LaOuIbPVL6q9F7ZJzzr2" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "nodejs_package_manager_path": "npm",
+    "spring.configuration.checksum": "80d561e2fbc1e0595a6dbf49b1cd0afc"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8426f177-3450-4889-b6f1-b1564fb90527" name="Changes" comment="" />
+      <created>1655734459663</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1655734459663</updated>
+      <workItem from="1655734461259" duration="1761000" />
+      <workItem from="1655736597882" duration="26445000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
