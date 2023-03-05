@@ -19,25 +19,40 @@ Realizado com:
 
 
 ## ESR 
-Projeto prático
+Pratical assignment
 
 Realizado com:
 * [Ana Sofia](https://github.com/anasofiagif)
 * [Rui Ribeiro](https://github.com/ruiasribeiro)
 
 
-# Perfis de especialização:
+# Perfis de especialização / Specializations:
 
-## Criptografia e Segurança:
+## Criptografia e Segurança/:
 
-### EC - Estruturas Criptográficas
+### EC - Estruturas Criptográficas / *Cryptographic Structures*
 
 Realizado com:
 * [Melânia Pereira](https://github.com/melpereira7)
 
 
-### TS - Tecnologias de Segurança
+### TS - Tecnologias de Segurança / Security Technologies
 
+Realizado com:
 * [Melânia Pereira](https://github.com/melpereira7)
 * [António Guerra](https://github.com/ribontone)
+
+### ES - Engenharia de Segurança / Security Engineering
+
+Realizado com:
+* [Melânia Pereira](https://github.com/melpereira7)
+* Paulo Pereira
+
+## Engenharia de Linguagens/ Language Engineering 
+
+
+## Engenharia Gramatical / Grammatical Engineering
+
+## Scripting no Processamento de Linguagem Natural
+
 
