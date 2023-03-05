@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout_auth.html}"
+      th:with="currentPage=#{label.signup}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<body>
+<div layout:fragment="content">
+    <form th:action="@{/signup_process}" method="post" th:object="${user}">
+
+        <div th:replace="fragment/fields::field-user-name"></div>
+
+        <div th:replace="fragment/fields::field-user-pwd"></div>
+
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">
+            </label>
+            <div class="col-sm-5">
+                <a href="login">Already have an account?</a>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="offset-sm-3 col-sm-9">
+                <button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.submit}" ></button>
+            </div>
+        </div>
+    </form>
+</div>
+<div layout:fragment="scripts">
+    <script type="text/javascript">
+        $('[data-toggle="tooltip"]').tooltip();
+    </script>
+</div>
+</body>
+</html>

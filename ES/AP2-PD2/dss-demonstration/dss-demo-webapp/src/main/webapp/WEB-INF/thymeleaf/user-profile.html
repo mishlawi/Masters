@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout.html}"
+      th:with="currentPage=#{label.update-user-data}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<body>
+<div layout:fragment="content">
+
+    <form method="post" th:action="@{/update-phone-number}" th:object="${user}">
+
+        <div class="form-group row" th:fragment="field-show-user-name">
+            <label class="col-sm-3 col-form-label" >
+                <span th:text="#{label.to.sign.username}"></span>
+            </label>
+            <div class="col-sm-5">
+                <input readonly class="form-control input-sm" autocomplete="yes" th:field="*{username}" />
+            </div>
+        </div>
+
+        <div class="form-group row" th:fragment="field-user-phone">
+            <label class="col-sm-3 col-form-label">
+                <span th:text="#{label.to.sign.userphone}"></span>
+            </label>
+            <div class="col-sm-5">
+                <input type="text" pattern="(\+351) *9[0-9]{8}" class="form-control input-sm" autocomplete="yes" th:field="*{telemovel}" />
+            </div>
+            <div class="col-xs-4">
+                <p th:if="${#fields.hasErrors('telemovel')}" th:errors="*{telemovel}" class="text-danger">Error</p>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="offset-sm-3 col-sm-9">
+                <button type="submit" class="btn btn-primary" id="submit-button" th:text="#{label.update}" ></button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<div layout:fragment="scripts">
+    <script type="text/javascript">
+        $('[data-toggle="tooltip"]').tooltip();
+    </script>
+</div>
+</body>
+</html>
