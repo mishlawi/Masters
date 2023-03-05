@@ -1,6 +1,21 @@
 # Masters
 Mestrado Integrado ano letivo 2021/2022
 
+##### 1º Semestre
+
+1. DAA
+2. CP
+3. ESR
+
+##### 2º Semestre
+
+1. CSI - EC
+2. CSI - ES
+3. CSI - TS
+4. EL - EG
+5. EL - SPLN
+6. EL - RPCW
+
 ## DAA
 Projeto prático
 
@@ -52,6 +67,7 @@ Realizado com:
 
 
 ### Engenharia Gramatical / Grammatical Engineering
+
 
 ### Scripting no Processamento de Linguagem Natural
 
