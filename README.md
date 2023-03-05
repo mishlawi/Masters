@@ -51,8 +51,8 @@ Realizado com:
 ## Engenharia de Linguagens/ Language Engineering 
 
 
-## Engenharia Gramatical / Grammatical Engineering
+### Engenharia Gramatical / Grammatical Engineering
 
-## Scripting no Processamento de Linguagem Natural
+### Scripting no Processamento de Linguagem Natural
 
 
