@@ -1,0 +1,24 @@
+extends layout
+
+block content      
+    .centerCard()
+        h2.w3-center(style="color: black;") 
+            b LOGS
+        a.w3-btn.w3-right.w3-round-medium.w3-margin-bottom(href='/admin/logs/download' style="background-color:#C5C1AE") Exportar 
+        table.w3-table-all.w3-hoverable.w3-round-medium
+            tr(style="    background-color: #527F52!important;color: white;")
+                th.w3-center ID Utilizador
+                th.w3-center Username
+                th.w3-center Data
+                th.w3-center Ação
+                th.w3-center Recurso
+            - var i=0
+            each log in logs
+                tr
+                    td.w3-center #{log.user_id}
+                    td.w3-center #{log.username}
+                    td.w3-center #{dt[i]}
+                    td.w3-center #{log.action}
+                    td.w3-center #{log.recurso}
+                    - i= i+1
+            
