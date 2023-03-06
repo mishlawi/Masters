@@ -1,0 +1,6 @@
+mysql_conf_path: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+mysql_bind_address: 'localhost'
+mysql_username: wiki
+mysql_host: 'localhost'
+mysql_password: root
+mysql_permissions: "wiki.*:ALL,GRANT"

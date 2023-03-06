@@ -1,0 +1,178 @@
+---
+  - name: create disk
+    gcp_compute_disk:
+      name: "{{ item }}"
+      size_gb: "{{ disk_size }}"
+      source_image: projects/ubuntu-os-cloud/global/images/ubuntu-minimal-2004-focal-v20211209
+      zone: "{{ zone }}"
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+      state: present
+    register: disk
+    loop: "{{ disks }}"
+
+  - name: create a network
+    gcp_compute_network:
+      name: "wiki-network"
+      auto_create_subnetworks: 'true'
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+      state: present
+    register: network
+
+  - name: create an address
+    gcp_compute_address:
+      name: "{{ item }}"
+      region: "{{ region }}"
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+      state: present
+    register: address
+    loop: "{{ addresses }}"      
+        
+  - name: internal/external firewall rules
+    gcp_compute_firewall:
+      name: "internal-external-rules"
+      allowed:
+        - ip_protocol: tcp
+          ports:
+            - '22'
+            - '80'
+            - '10022'
+            - '10080'
+            - '9200'
+            - '9300'
+            - '5601'
+        - ip_protocol: icmp
+      network: "{{ network }}"
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+      state: present
+
+  - name: internal firewall rules
+    gcp_compute_firewall:
+      name: "internal-rules"
+      allowed:
+        - ip_protocol: tcp
+          ports:
+            - '6380'
+            - '5432'
+            - '10022'
+            - '10080'
+      source_ranges:
+        - '10.132.0.0/20'
+      network: "{{ network }}"
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+      state: present      
+
+
+  - name: create wiki instance
+    gcp_compute_instance:
+      name: "wiki"
+      machine_type: e2-medium
+      disks:
+        - auto_delete: true
+          boot: true
+          source: "{{ disk.results[0] }}"
+      metadata:
+            ssh-keys: "{{ ansible_ssh_user }}:{{ lookup('file',  '~/.ssh/id_rsa.pub') }}"
+      tags:
+        items:
+          - http-server
+          - https-server
+      network_interfaces:
+        - network: "{{ network }}"
+          access_configs:
+          - name: External NAT
+            nat_ip: "{{ address.results[0] }}"
+            type: ONE_TO_ONE_NAT
+      zone: "{{ zone }}"
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+      state: present
+    register: instance
+
+  - name: create elk instance
+    gcp_compute_instance:
+      name: "elk"
+      machine_type: e2-medium
+      disks:
+        - auto_delete: true
+          boot: true
+          source: "{{ disk.results[1] }}"
+      metadata:
+            ssh-keys: "{{ ansible_ssh_user }}:{{ lookup('file',  '~/.ssh/id_rsa.pub') }}"
+      tags:
+        items: 
+          - http-server
+          - https-server
+      network_interfaces:
+        - network: "{{ network }}"
+          access_configs:
+          - name: External NAT
+            nat_ip: "{{ address.results[1] }}"
+            type: ONE_TO_ONE_NAT
+      zone: "{{ zone }}"
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+      state: present
+    register: instance
+
+
+  - name: get wiki ip
+    gcp_compute_instance_info:
+      zone: "{{ zone }}"
+      filters:
+        - name = "wiki"
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+    register: infowiki
+  
+  - name: Add host wiki
+    add_host:
+      name: "{{ infowiki.resources[0].networkInterfaces[0].accessConfigs[0].natIP }}"
+      groups: wiki
+
+  - name: get elk ip
+    gcp_compute_instance_info:
+      zone: "{{ zone }}"
+      filters:
+        - name = "elk"
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+    register: infoelk
+
+  - name: add internal elk
+    add_host:
+      name: "{{ infoelk.resources[0].networkInterfaces[0].networkIP }}"
+      groups: elkInternal
+  
+  - name: Add host elk
+    add_host:
+      name: "{{ infoelk.resources[0].networkInterfaces[0].accessConfigs[0].natIP }}"
+      groups: elk
+
+  - name: Wait for instances to respond
+    wait_for:
+      host: "{{ item }}"
+      port: 22
+    loop: 
+      - "{{ groups['wiki'][0] }}"
+      - "{{ groups['elk'][0] }}"
+  
+  - name: wait for SSH for instances
+    wait_for:
+      delay: 10
+      host: "{{ groups['wiki'][0] }}"
+      port: 22
+      state: started

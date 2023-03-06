@@ -1,0 +1,13 @@
+{
+    "type": "service_account",
+    "project_id": "ascn-330814",
+    "private_key_id": "562f01e5247a2da33bdc38e4df67e4884cd09d35",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCweYl5iHi8Mfyn\nKle5XbfHcBsuYjqlA9krHvrYo4pCymJUmJ0sM2fvJAYRlT2DTR08AnC8njSIKHhI\nBHcPYR2jHkfLTGp0airmVgCOpwh8+XM4gRlsn8yJn123e8UY9cX+dxi2vYyTvHZ1\nqgl59ulh41Exj0aRIvNOe/dIi/XV1e7BV9sXlS36IFp+29+JCeOHtqwfXeWImkYI\n5oMx0SSICtnUvYV0qxOJL9iCQS8PESn5fEjZDifHPjy0f+aNmHZdUIYZbK2mSlZq\nUvGUsJQfV6/Le1V1LV6fBaF/CTheaW9o5T08LR2hfYR3Z5RvvjwtwblJ7DZF98Ci\nJARCdlylAgMBAAECggEABZj5TBZQ1BFW1PuSGEJZfbU3238IoqrOVOCQ7tWzIT63\nozzLAXeo9IwlOCIOdy93PavLJSR0gJweApTHrQB01vNzLgbguowSi8dPEbdJHOOx\nrKllo80myPe52oPNwuaqztE6wrMc9iOsczt/PPPgv7bc4LBNefWMl6D1fULZO5zV\nz3koLhqoT9dYM3A4s0PDJTXFjBmUtB+lF5m9sUgYNpmC17quV1drrpI4CmsuNKEU\nR1n0hI5i0DApv9AmiTyPwJNA9LxuvbpPjjzPux2aTdBkIxr11WHUUtMe5dF8FwdC\nAs1lcxEj4+r7PplUBJHVP02VPY7aOFhxiYB1EIvFIQKBgQDXXbZpCT1PptpewHZF\n3pNPBeVvMVTsc2S54malyNnOfmENfLsAn/RzwGrp6afx6bs37h8acMUYLNEf4/aG\nLyHHgtcahSmyp4Q3u0icGwH5xrvQLLtaJfS2C8u8avtqf9YPlOh8xdTDaLmqa3iI\n95mVGmyYdPNxtBVBX/O9Vy9bxQKBgQDRxVrcdQJxXh9HK20AxpO3ZJwot9U2U0Pe\nM0QhogLh0if5M+SVo2PVQ3h46I7ROjx+0H/07N6FS6yS43Pf2BgK+/h6NF8fjSFH\nOanBtAO1ycqVozuh+5zRAt6NEE/ykRoI9+2Svz1LlyUuu9iOLQI5RQt6h67fs0Tw\noC8pFdirYQKBgGMwnhqyTrKovlp1egOkB2SV6p3TsrFUVEfopi4k22vnePulPtuC\n0Cufq54gJ2GbrMaNvXWICr6fpZFyhNA4VO52rGtieVn3HUYt07tSFQ7dIRM4BvH2\nGUbfF+6ntzPNvOFgS9Nrqhp12U1MQi+TGgE6MlnlQ1pS/pclgjTqOr2hAoGBAJRF\nTfLzldVx9OPGMxbQRYrkR2iUf9UVR6xgSjEHpcfeVrjTUCfgxGjyds3ne0MySZ5N\nW5RQdPx8v69XrAi1YlEpRrmCGRZhF/uTK4Up61FsH5BjP3xAL9igkZPdytSmcWOT\ncs499GJgpDyDNA9SivbV8cYa76VYvkrivlLpCSwhAoGAWYsfaXo3ZsoBdenfUUEF\n9ayfQs2Sf7pzo/TfcPar3W07ZLO58lgRLGIaa+3EIhh1OIuXAvqD3ORsRhtzpY/n\nyzKO/1W/UcFuPIYERFaNjukP4t3KV0dkI6fLu83S0diZK58eybDGfJGPPxCIaBNt\nQTFAmhjrx1/ErRruvL12Guo=\n-----END PRIVATE KEY-----\n",
+    "client_email": "my-ansible@ascn-330814.iam.gserviceaccount.com",
+    "client_id": "109930449447300303607",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/my-ansible%40ascn-330814.iam.gserviceaccount.com"
+  }
+  

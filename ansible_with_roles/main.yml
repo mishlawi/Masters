@@ -1,0 +1,40 @@
+---
+  - name: create infrastructure
+    hosts: localhost
+    connection: local
+    gather_facts: false
+    roles:
+      - create_vms
+      - create_database
+
+  - name: elastic search e kibana 
+    hosts: elk
+    become: yes
+    gather_facts: true
+    roles: 
+      - { role: elk, 
+          elastic_host: "{{ groups['elkInternal'][0] }}"
+        }
+
+  - name: run elk
+    hosts: elk
+    tasks:
+      - name: get java path
+        shell: update-alternatives --config java
+        register: path
+      - name: export path to java
+        shell: "export JAVA_HOME={{ path.stdout_lines[0].split(':')[1].split(' ')[1] }}"
+      - name: start elastic search
+        shell: nohup elasticsearch-7.16.2/./bin/elasticsearch </dev/null >/dev/null 2>&1 &
+      - name: start kibana
+        shell: nohup kibana-7.16.2-linux-x86_64/./bin/kibana </dev/null >/dev/null 2>&1 &
+
+  - name: install wiki
+    hosts: wiki
+    become: yes
+    roles:
+      - install_wiki
+      - { role: mbeat, 
+          elastic_host: "{{ groups['elk'][0] }}",
+          kibana_host:  "{{ groups['elk'][0] }}"
+        }

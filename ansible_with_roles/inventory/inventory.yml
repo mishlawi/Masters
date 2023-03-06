@@ -1,0 +1,25 @@
+all: 
+  vars:
+    #ansible_ssh_user: melanipereira98
+    #vm_name: wiki
+    #sql_name: teste256
+    zone: europe-west1-b
+    region: europe-west1
+    project: ascn-330814
+    auth_kind: serviceaccount
+    file: ./service.json
+    disk_size: 15
+    disks:
+      - disk-01
+      - disk-02
+    addresses:
+      - addr-01
+      - addr-02
+    db_name: postgres
+    db_username: ansible
+    db_password: pass
+    dependencies:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release

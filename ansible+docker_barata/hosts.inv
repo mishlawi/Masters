@@ -1,0 +1,2 @@
+[vm]
+35.233.53.205            ansible_connection=ssh        ansible_user=melanipereira98

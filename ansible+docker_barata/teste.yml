@@ -1,0 +1,17 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: get info on an instance
+      gcp_sql_instance_info:
+        project: ascn-330814
+        auth_kind: serviceaccount
+        service_account_file: "./service.json"
+      register: info
+    
+    - name: print all returned values
+      debug:
+        msg: "{{ info.resources[0].ipAddresses[0].ipAddress }}"
+
+    - name: env
+      environment:
+        ipdb: info.resources[0].ipAddresses[0].ipAddress

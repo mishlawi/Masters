@@ -1,0 +1,39 @@
+- name: install mysql-server
+  apt:
+    name: mysql-server
+    state: latest
+
+- name: install pip
+  apt:
+    name: python3-pip
+    state: latest
+
+- name: install pymysql
+  pip:
+    name: pymysql
+  
+- name: start mysql
+  command: service mysql start
+
+- name: Create a new database with name 'wiki'
+  mysql_db:
+    name: wiki
+    state: present
+
+- name: create user with permissions
+  mysql_user:
+    name: "{{ mysql_username }}"
+    host: "{{ mysql_host }}"
+    password: "{{ mysql_password}}"
+    priv: "{{ mysql_permissions }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: edit bind-address configurations
+  lineinfile:
+    path: "{{ mysql_conf_path }}"
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regex: '^bind-address[\s=]*[\S]', line: 'bind-address= {{ mysql_bind_address }}' }
+    - { regex: '^mysqlx-bind-address[\s=]*[\S]', line: 'mysqlx-bind-address= {{ mysql_bind_address }}' }
+  notify: restart mysql

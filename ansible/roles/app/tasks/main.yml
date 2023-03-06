@@ -1,0 +1,40 @@
+- name: update system packages
+  apt:
+    update_cache: yes
+- name: install dependencies
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop : "{{ dependencies }}"
+- name: install yarn
+  npm:
+    name: yarn
+    global: yes
+    state: latest
+- name: clone wiki
+  git:
+    repo: https://github.com/Requarks/wiki
+    dest: wiki/
+    force: yes
+- name: run yarn
+  command: yarn
+  args:
+    chdir: wiki/
+- name: rename file config.sample.yml to config.yml
+  command: mv config.sample.yml config.yml
+  args:
+    chdir: wiki/ 
+- name: change database configurations
+  lineinfile:
+    path: wiki/config.yml
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regex: 'type: postgres', line: 'type: mysql'}
+    #- { regex: 'host: localhost', line: 'host: localhost'}
+    #- { regex: 'db: wiki', line: 'db: wiki'}
+    - { regex: 'user: wikijs', line: 'user: root'}
+    - { regex: 'pass: wikijsrocks', line: 'pass: wiki'}
+- name: run yarn
+  command: yarn dev

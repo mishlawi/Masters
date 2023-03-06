@@ -1,0 +1,69 @@
+- hosts: vm
+  become: yes
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: install dependencies
+      apt:
+        update_cache: yes
+        name: "{{ item }}"
+      loop:
+        "{{ vars.dependencies}}"
+        
+    - name: curl docker
+      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+    - name: echo install docker
+      shell: echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    
+    - name: Update apt and install docker-ce
+      apt: 
+        update_cache: yes 
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: latest
+        
+    - name: install nodejs with docker
+      command: docker pull node
+    
+    - name: curl docker compose
+      shell: sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+    - name: chmod compose
+      shell: sudo chmod +x /usr/local/bin/docker-compose
+
+    - name: copy service.json
+      copy:
+        src: ./service.json
+        dest: ./
+
+    - name: get info on an instance
+      gcp_sql_instance_info:
+        project: ascn-330814
+        auth_kind: serviceaccount
+        service_account_file: "./service.json"
+      register: info
+      environment:
+        ipdb: info.resources[0].ipAddresses[0].ipAddress
+        dbname: db_name
+        dbuser: db_username
+        dbpass: db_password
+
+
+    - name: docker db
+      shell: docker run -d -p 8080:3000 --name wiki --restart unless-stopped -e "DB_TYPE=postgres" -e "DB_HOST=$ipdb" -e "DB_PORT=5432" -e "DB_USER={{ db_username }}" -e "DB_PASS={{ db_password}}" -e "DB_NAME={{ db_name }}" requarks/wiki:2 || true
+
+    - name: copy compose file
+      copy:
+        src: docker-compose.yml
+        dest: ./
+    
+    - name: copy vars file
+      copy:
+        src: vars.yml
+        dest: ./
+
+    - name: run compose
+      command: docker-compose up -d
