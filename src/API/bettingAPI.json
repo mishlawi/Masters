@@ -1,0 +1,40 @@
+{
+  "listEventsAll": [
+    {
+      "event": {
+        "id": 1,
+        "sport": "soccer",
+        "type": "full time",
+        "team1": "barcelona",
+        "team2": "benfica",
+        "result_odd": {
+          "home": 1.6,
+          "tie": 4.1,
+          "away": 5.2
+        }
+      }
+    },
+    {
+      "event": {
+        "id": 2,
+        "sport": "soccer",
+        "type": "full time",
+        "team1": "villareal",
+        "team2": "mancherter united",
+        "result_odd": {
+          "home": 2.9,
+          "tie": 3.4,
+          "away": 2.4
+        }
+      }
+    },
+    {
+      "event": {
+        "id": 3,
+        "sport": "f1",
+        "drivers": ["a","b","c"],
+        "odds": [1,2,3]
+      }
+    }
+  ]
+}
