@@ -1,0 +1,28 @@
+...
+
+def en2pt(texto):
+    texto = f"_{texto}"
+    while True:
+        
+        if ( X := re.search(r'_(\w+\ \w+)    ', texto,flags=re.X)) and ( (X[1]) in enpt):
+            texto,v = re.subn(
+                r'_(\w+\ \w+)    ', 
+                lambda X: ( enpt[(X[1])]                      ) + "_",
+                texto, 
+                flags=re.X)
+            if v: continue
+        
+        ... 
+
+        texto,v = re.subn(r'_is(?=\ \w+ing) ', r'está a_', texto, flags=re.X)
+        if v: continue
+
+        ... 
+        if texto[-1] == '_':
+            return texto[:-1]
+        texto = re.sub(r'_(.)', r'\1_', texto)        
+
+print( en2pt("""
+The dog and the cat are sleeping most of the time. 
+The tiger is the most endangered big cat in Asia"""))
+

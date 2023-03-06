@@ -1,0 +1,36 @@
+%import common.WORD
+%import common.DIGIT
+%import common.NEWLINE
+%import common.LETTER
+%import common.INT
+%import common.WS
+
+start : comando+
+
+comando : pedido SPACE* "->" SPACE* sub NEWLINE+
+        | pedido SPACE* "=>" SPACE* func NEWLINE+
+        | LETTER (LETTER|DIGIT)* SPACE* "=" dicionario NEWLINE+
+        | func NEWLINE+
+
+pedido : WORD (("-" WORD) | (SPACE WORD))*
+       | /./+
+
+sub : group (("-" group) | (SPACE+ group))*
+    | /./+
+
+group : WORD |/\\/ DIGIT
+
+func : WORD SPACE* "(" SPACE* args SPACE* ")"    
+     | "{" python "}"
+
+python : (/./|NEWLINE)+
+
+args : "[" SPACE* /\\/ DIGIT SPACE* ( "," SPACE* /\\/ DIGIT)* SPACE* "]"
+     | /\\/ DIGIT (SPACE+ /\\/ DIGIT)*
+
+
+dicionario : WS* "{" (WS* text SPACE* ":" SPACE* text SPACE* "," )* WS* "}"
+
+text :  /\"/ (/ã/|"A".."Z"|"a".."z"|" "|/ç/)* /\"/
+
+SPACE : " "
