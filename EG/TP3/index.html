@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html>
+    <style>
+        .footer {
+           left: 0;
+           bottom: 0;
+           width: 100%;
+           background-color: #1a97bc;
+           color: #1a97bc;
+           text-align: center;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        hr { background-color: #1a97bc; height: 1px; border: 0; }
+        body {
+            font-family: Arial;
+            margin: 0;
+        }
+        code {
+            display: block;
+            white-space: pre-wrap;  
+            text-align: initial;
+        }
+        .header {
+            padding: 5px;
+            text-align: center;
+            background: #1a97bc;
+            color: white;
+            font-size: 15px;
+        }
+        .autores{
+            padding: 20px;
+        }
+
+        .container{
+            padding: 20px;
+        }
+        /* Create two equal columns that floats next to each other */
+        .column {
+            float: left;
+            width: 50%;
+            padding: 10px;
+            height: 300px; /* Should be removed. Only for demonstration */
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        table, td, th {  
+          border: 1px solid #343738;
+          text-align: center;
+        }
+
+        table {
+          margin-left: 70px;
+          margin-right: 70px;
+          border-collapse: collapse;
+          width: 90%;
+        }
+        th {
+            background: #0099c0;
+            color: white;
+        }
+        th, td {
+          padding: 15px;
+        }
+
+        /* Create three equal columns that floats next to each other */
+.column1 {
+  float: left;
+  width: 33.33%;
+  padding: 10px;
+}
+
+/* Clear floats after the columns */
+.row1:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+      </style>
+    <head>
+        <title>EG - TP2</title>
+        <meta charset="UTF-8"/>
+    </head>
+    <body>
+        <div class="header">
+            <h1> 
+                <b>Engenharia Gramatical</b>
+                <br>
+                Relatório 
+            </h1>
+        </div>
+        <div class="autores">
+            <p><h3><b> Realizado por: </b></h3></p>
+                Angélica Cunha <i>PG47024</i>
+                <br>
+                Duarte Oliveira <i>PG47157</i>
+                <br> 
+                Tiago Barata <i>PG47695</i>
+        </div>
+        <hr>
+        <div class="container" style="margin-bottom: 20px;">
+            <h3>1. Variáveis</h3>
+                <ul style="list-style-type:none">
+                    <li><b >Variáveis do programa: </b> 8 
+                            &nbsp;&nbsp;['a', 'c', 'lista', 'banana', 'b', 'd', 'z', 'const'] </li>
+                    <li><b>Variáveis redeclaradas: </b> 1 
+                             &nbsp;&nbsp;['a'] </li>
+                    <li><b>Variáveis não-declaradas: </b> 5 
+                             &nbsp;&nbsp;['lista', 'banana', 'b', 'd', 'z'] </li>
+                    <li><b>Variáveis usadas, mas não inicializadas: </b> 3 
+                             &nbsp;&nbsp; ['banana', 'b', 'z']</li>
+                    <li><b>Variáveis declaradas, mas nunca mencionadas: </b>0 
+                             &nbsp;&nbsp; [] </li>
+                </ul>
+            <h3>2. Variáveis declaradas vs. Dados estruturados</h3>
+                <table>
+                    <tr>
+                        <th rowspan="2"><b>Variáveis</b></th>
+                        <th colspan="5"><b>Estruturas</b></th>
+                    </tr>
+                    <tr>
+                        <td><b>Dicionários</b></th>
+                        <td><b>Listas</b></th>
+                        <td><b>Tuplos</b></th>
+                        <td><b>Conjuntos</b></th>
+                        <td><b>Total</b></th>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>1</td>
+                        <td>4</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>6</td>
+                    </tr>
+                </table>
+            <h3>3. Instruções</h3>
+                <table>
+                    <tr>
+                        <th><b>Atribuições</b></th>
+                        <th><b>Leitura e Escrita</b></th>
+                        <th><b>Condicionais</b></th>
+                        <th><b>Ciclos</b></th>
+                        <th><b>Total</b></th>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>1</td>
+                        <td>4</td>
+                        <td>2</td>
+                        <td>17</td>
+                    </tr>
+                </table>
+            <h3>4. Estruturas de controlo aninhadas</h3>
+                <table>
+                    <tr>
+                        <th><b>Mesmo tipo</b></th>
+                        <th><b>Tipos diferentes</b></th>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>3</td>
+                    </tr>
+                </table>
+            <h3>5. Ifs aninhados</h3>
+                <table>
+                    <tr>
+                        <th><b>Antes</b></th>
+                        <th><b>Depois</b></th>
+                    </tr>
+                    <tr><td>
+					<code>if(b > 2){
+if(c == 2){
+d = a+b;
+while(z == 2){
+var z;
+var const;
+c = 3;
+d = 1+8*9-3+c+c;
+};
+};
+};
+					</code>
+</td><td>
+					<code>if(b > 2 and c == 2){
+d = a+b;
+while(z == 2){
+var z;
+var const;
+c = 3;
+d = 1+8*9-3+c+c;
+};
+};
+					</code>
+</td></tr><tr><td>
+					<code>if(b < 2 and a < 3){
+if(b > 2 and c == 2){
+d = a+b;
+while(z == 2){
+var z;
+var const;
+c = 3;
+d = 1+8*9-3+c+c;
+};
+};
+};
+					</code>
+</td><td>
+					<code>if(b < 2 and a < 3 and b > 2 and c == 2){
+d = a+b;
+while(z == 2){
+var z;
+var const;
+c = 3;
+d = 1+8*9-3+c+c;
+};
+};
+					</code>
+</td></tr>
+                    </tr>
+                </table>
+                <h3>6. Gráficos de Análise de Código</h3>
+                <table>
+                    <tr>
+                        <th><a href="frase4.txt" target="_blank"  style="color: inherit;"><b>Código</b></a></th>
+                        <th><b>CFG</b></th>
+                        <th><b>SDG</b></th>
+                    </tr>
+                     <tr>
+                        <td style="height:200px;"><object data="frase4.txt" style="width: -webkit-fill-available;height: -webkit-fill-available;"></object></td>
+                        <td><a href="./graphs/CFG.gv.png" target="_blank"><img src = "./graphs/CFG.gv.png" alt = "CFG" style="width:80%;"/></a></td>
+                        <td><a href="./graphs/SDG.gv.png" target="_blank"><img src = "./graphs/SDG.gv.png" alt = "SDG" style="width:80%;"/></a></td>
+                    </tr>
+                </table>
+                <h3>7. Complexidade de McCabe's</h3>
+                <p>A Complexidade de McCabe's é 7 pois: </p>
+                <p>Número de Arestas: 28</p>
+                <p>Número de Vértices: 23</p>
+                <p>Logo, aplicando a fórmula de complexidade <b>Arestas - Vértices + 2 </b> obtemos:</p>
+                <p  style="margin-left: 200px;"> A - V + 2 = 28 - 23 + 2 = 7</p>
+
+             </div>
+             <div class="footer">.</div>
+        </div>
+        
+    </body>
+</html>
