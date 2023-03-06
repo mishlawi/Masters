@@ -1,0 +1,35 @@
+extends layout
+
+block content      
+    .centerCard()
+        h2.w3-center(style="color: black;") 
+            b Minhas Submissoes
+        a.w3-btn.w3-right.w3-round-medium.w3-margin-bottom(href='/recurso/add' style="background-color:#C5C1AE") Novo 
+        if files.length > 0
+          table.w3-table-all.w3-hoverable.w3-round-medium
+              tr(style="    background-color: #527F52!important;color: white;")
+                  th Nome 
+                  th Autor
+                  th Descrição 
+                  th Data de Submissão
+                  th Data de Criação
+                  th(style="width: 1%;")
+              - var i = 0
+              each f in files
+                  tr(onclick="pageRedirectFile('"+ f._id +"')")
+                      td #{f.name}
+                      td #{f.user}
+                      td #{f.desc}
+                      td #{dtsubm[i]}
+                      td #{dCriacao[i]}
+                      - i=i+1
+                      td(style="width: 1%;")
+                          form.w3-container(class='w3-container' method='POST' action='/api/recursos/' + f._id)
+                              button.w3-btn.w3-round-large.w3-right
+                                  input.w3-input.w3-pink(type="submit" value = 'X')
+                
+                      
+
+        else
+            p Não tem submissões
+      

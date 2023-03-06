@@ -1,0 +1,32 @@
+extends layout
+
+block content      
+    .centerCard
+        h2.w3-center(style="color: black;") 
+            b Adicionar Utilizador
+        .w3-container.w3-center.w3-round-large(style="border: solid  #527F52;")
+            form.w3-container.w3-margin(class='w3-container' method='POST' action='/admin/users/add')
+               .w3-row.w3-margin-bottom
+                   .w3-col.s3
+                       label Username
+                   .w3-col.s9.w3-border
+                       input.w3-input(type='text' name='username' placeholder='Insert username')
+
+               .w3-row.w3-margin-bottom
+                   .w3-col.s3
+                       label Password
+                   .w3-col.s9.w3-border
+                       input.w3-input(type='password' name='password' placeholder='Insert password')
+               
+               .w3-row.w3-margin-bottom
+                   .w3-col.s3
+                       label Tipo De Utilizador
+                   .w3-col.s9.w3-border
+                       select.w3-select(name="level")
+                           option(value="0" checked) Aluno
+                           option(value="1") Professor 
+                           option(value="2") Administrador 
+
+               .w3-row.w3-margin-top
+                   input.w3-btn.w3-teal(type='submit' value='Adicionar' style="background-color: #527F52 !important;margin-top: 20px;color: white;" )
+

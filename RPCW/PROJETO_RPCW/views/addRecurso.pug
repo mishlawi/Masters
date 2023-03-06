@@ -1,0 +1,46 @@
+extends layout
+
+block content
+    .centerCard
+        h2.w3-center(style="color: black;") 
+            b Adicionar Recurso
+        .w3-container.w3-center.w3-round-large(style="border: solid  #527F52;background-color: #F7F8FA; ")
+            form.w3-container.w3-margin(class='w3-container' method='POST' action='/api/recursos' enctype="multipart/form-data")
+                .w3-row.w3-margin-bottom
+                    div.label-w
+                       label.w3-left.w3-margin Nome do Conteúdo
+                    div.input-w
+                       input.w3-input.w3-margin(type='text' name='name' required)
+                .w3-row.w3-margin-bottom
+                    div.label-w
+                        label.w3-left.w3-margin Tipo De Recurso
+                    div.input-w
+                        select.w3-select.w3-left.w3-margin(name="type" style="width: 150px;")
+                            option(value="0" checked) Slides
+                            option(value="1") Exame     
+                            option(value="2") Manual
+                            option(value="3") Relatório
+                            option(value="4") Tese
+                .w3-row.w3-margin-bottom
+                    div.label-w
+                       label.w3-left.w3-margin Autor
+                    div.input-w
+                        input.w3-input.w3-margin(type='text' name='producer' placeholder='Insira o autor'  required)
+               
+                .w3-row.w3-margin-bottom
+                    div.label-w(style="width: 250px;")
+                        label.w3-left.w3-margin Data de criação do conteúdo
+                    div.input-w(style="width: 166px;")
+                       input.w3-input(type='date' name='creation_date' )
+                .w3-row.w3-margin-bottom
+                    div.label-w
+                       label.w3-left.w3-margin Descrição
+                    div.input-w
+                       textarea.w3-margin(rows="4" cols="100" name="desc") 
+                .w3-row.w3-margin-bottom
+                    div.label-w
+                       label.w3-left.w3-margin Ficheiro
+                    div.input-w
+                        input.w3-margin.w3-input.w3-cell(type="file" name="ficheiro" multiple)
+                .w3-row.w3-margin-top
+                    input.w3-btn.w3-teal(type='submit' value='Adicionar' style="background-color: #527F52 !important;margin-top: 20px;color: white;" )

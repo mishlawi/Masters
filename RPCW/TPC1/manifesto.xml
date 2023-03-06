@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc>
+    <meta>
+        <titulo>
+        TPC1 : Uma página Web sobre Jacarés
+        </titulo>
+        <data>
+        2022-02-15
+        </data>
+        <autor>
+            <id>PG47157</id>
+            <nome>Duarte Manuel Vilar de Oliveira</nome>
+        </autor>
+        <uc>
+        <sigla>RPCW2022</sigla>
+        <nome>Representação e Processamento de Conhecimento na Web</nome>
+        </uc>
+
+    </meta>
+    <resumo>
+        <p> Primeiro parágrafo.</p>
+        <p> Segundo parágrafo.</p>
+        <p> Terceiro parágrafo a apontar o 
+            <xref>
+                <url>xlm.com</url>
+                <texto>XML</text>
+            <xref>.</p>
+    </resumo>
+    <resultados>
+    <resultado>
+        <url>jose.html</url>
+        <texto>pagina web</texto>
+    </resultado>
+    <resultado><url>jose.css</url>
+    <texto>Stylesheet do TPC</texto></resultado>
+    
+</doc>

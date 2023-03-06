@@ -1,0 +1,68 @@
+extends layout
+
+block content
+    .w3-container.w3-auto.w3-round.w3-border.w3-white(style="margin-top: 50px; margin-bottom: 50px; padding-bottom: 16px;border-top-width: 16px;")
+      h1.w3-text-indigo #{classe.titulo} 
+      h6
+          b.w3-text-indigo Estado: 
+          span= classe.status
+      h6
+          b.w3-text-indigo Codigo: 
+          span= classe.codigo
+      h6 
+          b.w3-text-indigo Descricao: 
+          span= classe.descricao
+
+      if Object.keys(classe.pai).length > 0 
+        h6 
+            b.w3-text-indigo Pai:
+            .w3-div(style="padding-left: 25px;")
+                p Titulo: #{classe.pai.titulo}
+                p Codigo: 
+                    a(href=classe.pai.codigo)=classe.pai.codigo
+
+      if Object.keys(classe.filhos).length > 0 
+        h6 
+            b.w3-text-indigo Filhos:
+        ul
+            - var i = 1
+            each filho in classe.filhos 
+                li 
+                  b Filho #{i}
+                  - i=i+1
+                  p Título: #{filho.titulo}
+                  p Código: 
+                    a(href=filho.codigo)=filho.codigo
+                  p Estado: #{filho.status}
+      
+      if classe.nivel == "3"
+        if Object.keys(classe.processosRelacionados).length > 0 
+            h6 
+            b.w3-text-indigo Processos Relacionados:
+            ul
+               - var i = 1 
+               each relacao in classe.processosRelacionados
+                   if (relacao.idRel == "eComplementarDe" || relacao.idRel == "eCruzadoCom" ||relacao.idRel == "eSuplementoDe" ||relacao.idRel =="eSuplementoPara")
+                        li 
+                          b Processo #{i}
+                          case relacao.idRel 
+                              when "eComplementarDe"
+                                  p Relação: Processo Complementar 
+                              when "eCruzadoCom"
+                                  p Relação: Processo cruzado
+                              when "eSuplementoDe"
+                                  p Relação: Processo suplementar de 
+                              when "eSuplementoPara"
+                                  p Relação: Processo suplementar para
+                          - i=i+1
+                          p Título: #{relacao.titulo}
+                          p Estado: #{relacao.status}
+                          p Código: 
+                            a(href=relacao.codigo)=relacao.codigo
+                     
+        adress 
+          a(href="/") Back
+            
+
+    
+    

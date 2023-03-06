@@ -1,0 +1,143 @@
+extends layout
+
+block content      
+    .centerCard
+        h2.w3-center(style="color: black;") 
+            b Nome Recurso:  
+            |#{rec.name}
+            
+        .w3-container
+            if user.level == 2
+                a.w3-btn.w3-right.w3-round-medium.w3-margin-bottom(href='/recursos/edit/'+rec._id style="background-color:#527F52;color:white") Editar
+            else if user.level ==1 & rec.user==user.username
+                a.w3-btn.w3-right.w3-round-medium.w3-margin-bottom(href='/recursos/edit/'+rec._id style="background-color:#527F52;color:white") Editar
+
+        .w3-card-4.modal(id="display")
+
+        .w3-container.w3-center.w3-round-large.w3-padding-16.w3-margin-bottom(style="border: solid  #527F52;background-color: #F7F8FA;")
+                .w3-row.w3-margin-bottom
+                    .w3-col.s3
+                       label Produtor
+                    .w3-col.s9.w3-border
+                       input.w3-input(type='text' value=rec.producer readonly)
+
+                .w3-row.w3-margin-bottom
+                    .w3-col.s3
+                       label Data de produção
+                    .w3-col.s9.w3-border
+                       input.w3-input(type='text' value=dCriacao readonly)
+
+                .w3-row.w3-margin-bottom
+                   .w3-col.s3
+                       label Submetido por
+                   .w3-col.s9.w3-border
+                       input.w3-input(type='text' value=rec.user readonly)
+
+                .w3-row.w3-margin-bottom
+                    .w3-col.s3
+                       label Submetido em
+                    .w3-col.s3.w3-border
+                        input.w3-input.w3-center(type='text' value=dSubm readonly)
+                    .w3-col.s3
+                       label Horas
+                    .w3-col.s3.w3-border
+                        input.w3-input.w3-center(type='text' value=hSubm readonly)    
+                    
+                .w3-row.w3-margin-bottom
+                   .w3-col.s3
+                       label Tipo 
+                   .w3-col.s3.w3-border
+                        - var tipo = ""
+                        case rec.type 
+                            when 0: tipo="slides"
+                            when 1: tipo="exame"
+                            when 2: tipo="manual"
+                            when 3: tipo="relatório"
+                            when 4: tipo="tese"
+                .w3-row.w3-margin-bottom
+                    .w3-col.s3.w3-margin-top
+                        label Descrição
+                    .w3-col.s9
+                       if rec.desc==' '
+                            p.w3-left Sem descrição
+                       else 
+                            input.w3-input.w3-center(type='text' value=rec.desc readonly)  
+                            
+                .w3-row.w3-margin-bottom
+                   .w3-col.s3
+                       label Recurso 
+
+                   .w3-col.s3
+                        if rec.mimetype == "image/png" || rec.mimetype == "image/jpeg"
+                            button.w3-btn.w3-green(onclick='showFicheiro(' + JSON.stringify(rec)+')') Ver 
+                        else 
+                            a.w3-btn.w3-green( href="http://localhost:8000/"+rec.path.substring(68) target='_blank' rel="noopener noreferrer") Ver
+                   .w3-col.s3    
+                        a.w3-btn.w3-green( href="http://localhost:8000/download/"+rec._id ) Download
+
+        .w3-container.w3-center.w3-round-large.w3-padding-16(style="border: solid  #527F52;background-color: #F7F8FA;")
+            h4.w3-margin
+                b Comentários  
+            form.card(method='POST' action='/addComentario/'+rec._id style=" padding-left: 0px;")
+                .row
+                  .col-10
+                    .comment-box.ml-2
+                      h6 Adicione o seu:
+                      .rating
+                        input#5(type='radio' name='rating' value='5')
+                        label(for='5') &star;
+                        input#4(type='radio' name='rating' value='4')
+                        label(for='4') &star;
+                        input#3(type='radio' name='rating' value='3')
+                        label(for='3') &star;
+                        input#2(type='radio' name='rating' value='2')
+                        label(for='2') &star;
+                        input#1(type='radio' name='rating' value='1')
+                        label(for='1') &star;
+                      .comment-area
+                        textarea.form-control(placeholder='Qual é a sua opinião?' rows='4' name='comentario')
+                      .comment-btns.mt-2
+                              button(type="submit").btn.btn-success.send.btn-sm
+                                | Send 
+                                i.fa.fa-long-arrow-right.ml-1
+            hr(style="border: 1px solid #527F52;")
+
+            if rec.comments.length > 0
+                - var j=0
+                each c in rec.comments
+                    .w3-row
+                        .w3-col.s3
+                            p.w3-left 
+                                b #{c.from}       
+                                if c.rating
+                                    - var i=0
+                                    while i<c.rating
+                                        span
+                                            i.fa.fa-star 
+                                        - i=i+1
+                    
+                                
+                        .w3-col.s7  
+                            p.w3-left #{c.content}
+                        .w3-col.s2
+                            p.w3-left #{dCom[j]} 
+                            if user.level==2 || user.username==c.from
+                                form.w3-right( method='POST' action='/deleteComentario/' + c._id+'/recurso/'+rec._id)
+                                  button.w3-btn.w3-round-large.w3-right
+                                      input.w3-input.w3-pink(type="submit" value = 'X')
+                    - j=j+1
+
+                    hr(style="border: 1px dotted #527F52;")
+            else 
+                p Não há comentários
+                
+                    
+               
+                        
+
+            
+
+                
+
+            
+
