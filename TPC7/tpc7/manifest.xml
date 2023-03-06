@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc>
+    <meta>
+        <titulo>
+            TPC7: CLAV
+        </titulo>
+        <data>
+            11 de Abril de 2022
+        </data>
+        <autor>
+            <id>PG47157</id>
+            <nome>Duarte Manuel Vilar de Oliveira</nome>
+        </autor>
+        <uc>
+            <sigla>RPCW2022</sigla>
+            <nome>Representação e Processamento de Conhecimento na Web</nome>
+        </uc>
+        <resumo>
+            <p>Uso de Express, em Node.JS de forma a consultar uma API de dados da adminstração pública portuguesa.</p>
+        </resumo>
+        <resultados>
+            <resultado>
+                <url>./bin/www</url>
+                <texto>Ficheiro base da aplicação Express.</texto>
+		<ficheiro>app.js</ficheiro>
+		<texto> </texto>
+	</resultado>
+        </resultados>
+    </meta>
+</doc>

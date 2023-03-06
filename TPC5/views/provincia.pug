@@ -1,0 +1,17 @@
+extends layout
+
+block content
+    h1 Lista de Músicas da Província #{musicas[0].prov}
+    h2 22 de março de 2022
+    table
+        tr
+            th Título 
+            th Músico 
+        each m in musicas 
+            tr 
+                td
+                    a(href="/musicas/" + m.tit)= m.tit
+                td= m.musico
+    hr
+    address 
+        a(href="/musicas") Voltar à lista 

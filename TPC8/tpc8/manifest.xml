@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc>
+    <meta>
+        <titulo>
+            TPC8: Projeto jquery adicionar e remover parágrafos
+        </titulo>
+        <data>
+            26 de Abril de 2022
+        </data>
+        <autor>
+            <id>PG47157</id>
+            <nome>Duarte Manuel Vilar de Oliveira</nome>
+        </autor>
+        <uc>
+            <sigla>RPCW2022</sigla>
+            <nome>Representação e Processamento de Conhecimento na Web</nome>
+        </uc>
+        <resumo>
+		<p>Expandir o projeto iniciado na aula, adicionando operações de alteração e remoção de parágrafos</p>
+            <p>Topo da página é um formulario, resto da página é uma lista de parágrafos.</p>
+            <p>Cada parágrafo deve ter a opção de adicionar e remover.</p>
+        </resumo>
+        <resultados>
+            <resultado>
+                    <url>./index.html</url>
+                    <texto>Página principal.</texto>
+            </resultado>
+            <resultado>
+                <url>./srcipt.js</url>
+                <texto>Script para atualizar a pagina principal</texto>
+            </resultado>
+        </resultados>
+    </meta>
+</doc>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<doc>
+    <meta>
+        <title> TPC5: WebServer com Express e JsonServer </title>
+        <date> 2022-03-22 </date>
+        <author> 
+            <id>PG47157</id>
+            <nome>Duarte Oliveira</nome>
+        </author>
+        <uc> 
+            <sigla>RPCW2022</sigla>
+            <nome>Representação e Processamento de Conhecimento na Web</nome>
+        </uc>
+    </meta>
+    <resumo> 
+        <p>GET requests a um JSON server. Detalhes em páginas web.</p>
+	<p>O trabalho introduz o uso do Express, com views pug. O servidor responde às rotas '/' '/musicas', '/musicas/:titulo' e '/musicas/prov/:idProv'.</p>
+        <p>Ficheiros usados<url>arq-son.json</url><texto>Ficheiro JSON</texto>.</p>
+    </resumo>
+    <resultados>
+        <resultado><url>/views</url><texto>View apresentada ao user</texto></resultado>
+        <resultado><url>/routes/index.js</url><texto>Rotas definidas para responder aos diferentes tipos de pedidos</texto></resultado>
+    </resultados>
+</doc>
