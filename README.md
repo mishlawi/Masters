@@ -15,7 +15,7 @@ Mestrado Integrado ano letivo 2021/2022
 1. *CSI* - [EC](https://github.com/mishlawi/Masters/tree/main/EC)
 2. *CSI* - [ES](https://github.com/mishlawi/Masters/tree/main/ES)
 3. *CSI* - [TS](https://github.com/mishlawi/Masters/tree/main/TS)
-4. *EL* - [EG](https://github.com/mishlawi/Masters/tree/main/EG)Realizado com:
+4. *EL* - [EG](https://github.com/mishlawi/Masters/tree/main/EG)
 5. *EL* - [SPLN](https://github.com/mishlawi/Masters/tree/main/SPLN)
 6. *EL* - [RPCW](https://github.com/mishlawi/Masters/tree/main/RPCW)
 
