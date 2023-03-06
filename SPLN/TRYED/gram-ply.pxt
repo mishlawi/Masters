@@ -1,0 +1,22 @@
+...
+
+## Grammar
+
+def p_a(p): "prog : prog defrr"          ; print(p[2],end="")
+def p_b(p): "prog : prog linha"          ; print(p[2],end="")
+def p_c(p): "prog : "                    ; print("import re")
+
+def p_d(p): "defrr : REWRITE id '{' rules '}'" ;\
+    p[0] = gen_rr(p[2],p[4])
+
+def p_e(p): "rules : rules rule"         ; p[0] = f"{p[1]}\n{p[2]}"
+def p_f(p): "rules : rule"               ; p[0] = p[1]
+
+def p_g(p): "rule : RULE1"               ; p[0] = gen_rule1(p[1])
+def p_h(p): "rule : RULE2"               ; p[0] = gen_rule2(p[1])
+def p_i(p): "rule : RULE3"               ; p[0] = gen_rule3(p[1])
+
+...
+
+
+RULE1 ......apanha a regra toda de uma vez

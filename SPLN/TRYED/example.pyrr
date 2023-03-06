@@ -1,0 +1,32 @@
+enpt = {  
+  "dog": "cão", 
+  "cat": "gato",
+  "the": "o",
+  "a": "um",
+  "and": "e",
+  "big cat": "grande felino",
+  "big": "grande",
+  "endangered": "ameaçado",
+  "the most": "o mais",
+  "most": "o maior parte",
+}
+
+defrr en2pt{
+   (\w+\ \w+)    :e: enpt[\1]                      !! \1 in enpt
+   (\w+)         :e: enpt[\1]                      !! \1 in enpt
+   (\w+)         :e: (enpt[(\1).lower()]).title()  !! (\1).lower() in enpt
+   are(?=\ \w+ing) ::estão a
+   is(?=\ \w+ing) ::está a
+   is\b          ::é
+   case\b        ::caso
+   each\ case    ::caso a caso
+   (\W+)         ::\1
+   (\d+)         ::\1
+   ([A-ZÁÉÍÓÚ]\w+)::\1
+   (\w+)         ::?\1
+}
+
+print( en2pt("""
+  The dog and the cat are sleeping most of the time. 
+  The tiger is the most endangered big cat in Asia"""))
+
