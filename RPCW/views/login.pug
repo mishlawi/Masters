@@ -1,0 +1,18 @@
+extends layout1
+
+block content
+    .w3-top
+    .w3-container.w3-center.w3-round-large(style="color: #000000ad!important;background-color: #c5c1aeb5;position: absolute;top: 40%;left: 50%;transform: translate(-50%, -50%);")
+        .centerCard
+            header 
+                h3 Login
+            form.w3-container(action='/api/login' method='POST')
+                label Username:
+                input.w3-input(type="text" name="username")
+                label Password:
+                input.w3-input(type="password" name="password")
+                
+                input.w3-btn.w3-margin(style="background-color: #222221;margin-top: 20px;color: white;" type="submit" value="Enviar")
+            a.w3-margin(href="/registo") Ainda não tem conta? Registe-se!
+    
+        

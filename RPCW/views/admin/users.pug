@@ -1,0 +1,32 @@
+extends layout
+
+block content      
+    .centerCard()
+        h2.w3-center(style="color: black;") 
+            b Lista de Utilizadores
+        a.w3-btn.w3-right.w3-round-medium.w3-margin-bottom(href='/admin/users/create' style="background-color:#C5C1AE") Novo 
+        table.w3-table-all.w3-hoverable.w3-round-medium
+            tr(style="    background-color: #527F52!important;color: white;")
+                th ID Utilizador
+                th Username
+                th Tipo
+                th(style="width: 1%;")
+            each u in users
+                tr(onclick="pageRedirect('"+ u._id +"')")
+                    td #{u._id}
+                    td #{u.username}
+                    if u.level == 0
+                        td Aluno
+                    else if (u.level == 1)
+                        td Professor
+                    else if (u.level == 2)
+                        td Administrador
+                    else
+                        td Desconhecido
+                    td(style="width: 1%;")
+                        form.w3-container(class='w3-container' method='POST' action='/admin/users/delete/' + u._id)
+                            button.w3-btn.w3-round-large.w3-right
+                                input.w3-input.w3-pink(type="submit" value = 'X')
+
+            
+            

@@ -1,0 +1,93 @@
+extends layout
+
+block content      
+    .centerCard()
+        h2.w3-center(style="color: black;") 
+            b Notícias
+        if user.level == 2
+            div.dropdown(style="float:left; padding-left:10px;")
+              button.w3-btn.w3-right.w3-round-medium.w3-margin-bottom(href='/recurso/add' style="background-color:#d4ad28;color:white") Filtrar por tipo
+                div.dropdown-content
+                  a(href='/newsTodas') Todas
+                  a(href='/home') Ativas
+                  a(href='/newsInativas') Inativas
+        .w3-container.w3-center.w3-round-large.w3-padding-16(style="border: solid  #527F52;background-color: #F7F8FA;")
+            form.card(id="formNew" style=" padding-left: 0px; width:auto !important;")
+                .row
+                  .w3-col.s3
+                     h5.w3-left(style=" margin-left: 10px;margin-top: 30px;") Adicone uma notícia:
+                  .w3-col.s9
+                      
+                      .comment-area.w3-left
+                        textarea.form-control(id="novaNew" placeholder='Partilhe connosco...' rows='4' cols='70' name='free')
+                      .comment-btns.mt-2
+                              button(id="botaoNova" type="submit" style="  margin-top: 30px;").btn.btn-success.send.btn-sm
+                                | Send 
+                                i.fa.fa-long-arrow-right.ml-1
+            hr(style="border: 1px solid #527F52;")
+
+            if news.length > 0
+                - var j=0
+                each n in news
+                        .w3-row(id="rowNew")
+                            if j>0 
+                                hr(style="border: 1px dotted #527F52;")
+                            .w3-col.s1
+                                p.w3-left 
+                                    b #{n.user}       
+
+
+                            .w3-col.s5
+                                if n.action==2
+                                    p.w3-left  #{n.free}
+                                        
+                                if n.action==0
+                                    p.w3-left adicionou o recurso 
+                                        b 
+                                            a(href='/recursos/'+n.rec_id) #{n.rec_name}
+                                if n.action==1
+                                    p.w3-left comentou o recurso     
+                                        b
+                                            a(href='/recursos/'+n.rec_id) #{n.rec_name}  
+                                    if  n.rating!=-1
+                                        p.w3-left(style="padding-left: 6px; padding-right: 6px;")  e classificou com
+                                        if n.rating
+                                            - var i=0
+                                            while i<n.rating
+                                                span.w3-left(style="padding-top: 15px;")
+                                                    i.fa.fa-star 
+                                                - i=i+1
+                            .w3-col.s6
+                                p.w3-left #{data[j]}     
+                                if n.active==0
+                                    p.w3-left.w3-red(style="margin-left: 30px;")
+                                        b Inativa 
+                                if user.level==2 || (user.username==n.user && n.action==2 )
+                                    form.w3-right( method='POST' action='/api/deleteNew/' + n._id)
+                                      button.w3-btn.w3-round-large.w3-right
+                                          input.w3-input.w3-pink(type="submit" value = 'x')
+                                if user.level==2 && n.active==1
+                                    form.w3-right( method='POST' action='/api/newHide/' + n._id)
+                                      button.w3-btn.w3-round-large.w3-right
+                                          input.w3-input.w3-pink(type="submit" value = 'Desativar')
+                                if user.level==2 && n.active==0
+                                    form.w3-right( method='POST' action='/api/newShow/' + n._id)
+                                      button.w3-btn.w3-round-large.w3-right
+                                          input.w3-input.w3-pink(type="submit" value = 'Ativar')
+                                if n.action==2 && (user.level==2 || user.username==n.user) 
+                                    button.w3-btn.w3-round-large.w3-right(id="botaoEdit" data-id=''+n._id+'' data=''+n.free+'' )
+                                        input.w3-input.w3-pink(id="inputEdit" type="button" value = 'Editar')
+                                
+                        if n.action==1
+                            .w3-row 
+                                .w3-col.s1   
+                                    p 
+                                .w3-col.s11 
+                                    p.w3-left 
+                                        b Comentário: 
+                                        | #{n.comment}      
+
+                        - j=j+1
+                            
+            else 
+                p Não há notícias

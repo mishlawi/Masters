@@ -1,0 +1,47 @@
+extends layout
+
+block content      
+    .centerCard()
+        h2.w3-center(style="color: black;") 
+            b Lista de Recursos
+        if level!=0
+          a.w3-btn.w3-right.w3-round-medium.w3-margin-bottom(href='/recurso/add' style="background-color:#527F52;color:white")  Novo 
+        div.dropdown(style="float:left; padding-left:10px;")
+          button.w3-btn.w3-right.w3-round-medium.w3-margin-bottom(href='/recurso/add' style="background-color:#d4ad28;color:white") Filtrar por tipo
+            div.dropdown-content
+              a(href='/recursos') Todos
+              a(href='/tipo/0') Slides
+              a(href='/tipo/1') Exame
+              a(href='/tipo/2') Manual
+              a(href='/tipo/3') Relatório
+              a(href='/tipo/4') Tese
+        form.w3-container.w3-left( method='GET' action='/recursos/search')
+          input(type="text" placeholder="Search.." name="search")
+          button(type="submit")
+            i.fa.fa-search
+        if files.length > 0
+          table.w3-table-all.w3-hoverable.w3-round-medium
+              tr(style="    background-color: #527F52!important;color: white;")
+                  th Nome 
+                  th Autor
+                  th Submetido por 
+                  th Descrição 
+                  th Data de Submissão
+                  th Data de Criação
+              - var i = 0
+              each f in files
+                  tr(onclick="pageRedirectFile('"+ f._id +"')")
+                      td #{f.name}
+                      td #{f.producer}
+                      td #{f.user}
+                      td #{f.desc}
+                      td #{dtsubm[i]}
+                      td #{dCriacao[i]}
+                      - i=i+1
+                      
+                      
+
+        else
+           .w3-container.w3-center
+                p Não há ficheiros a listar
+      
