@@ -1,0 +1,16 @@
+- name: database deployment
+  hosts: gcp_vm
+  become: yes
+  roles: 
+    - db
+  tags:
+    - db
+
+- name: app deployment
+  hosts: gcp_vm
+  become: yes
+  roles: 
+    - app
+  tags:
+    - app
+  

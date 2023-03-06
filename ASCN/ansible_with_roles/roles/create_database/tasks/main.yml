@@ -1,0 +1,63 @@
+---
+  - name: create an instance
+    google.cloud.gcp_sql_instance:
+      name: "{{ sql_name }}"
+      database_version: "POSTGRES_14"
+      backend_type: "SECOND_GEN"
+      settings:
+        ip_configuration:
+          authorized_networks:
+          - name: google dns server
+            value: 0.0.0.0/0
+        tier: db-custom-2-7680
+      region: "{{ region }}"
+      project: "{{ project }}"
+      auth_kind: "{{ auth_kind }}"
+      service_account_file: "{{ file }}"
+      state: present
+    register: instance
+
+#  - name: create a replica
+#    google.cloud.gcp_sql_instance:
+#      name: "{{ sql_name }}-replica"
+#      master_instance_name: "{{ sql_name }}"
+#      replica_configuration:
+#        failover_target: yes
+#      settings:
+#        ip_configuration:
+#          authorized_networks:
+#          - name: google dns server
+#            value: 0.0.0.0/0
+#        tier: db-custom-2-7680
+#      region: "{{ region }}"
+#      project: "{{ project }}"
+#      auth_kind: "{{ auth_kind }}"
+#      service_account_file: "{{ file }}"
+#      state: present
+#    register: instance_replica
+
+  - name: create a user
+    no_log: true
+    google.cloud.gcp_sql_user:
+      name: "{{ db_username }}"
+      host: ""
+      password: "{{ db_password }}"
+      instance: "{{ instance }}"
+      project: ascn-330814
+      auth_kind: serviceaccount
+      service_account_file: "./service.json"
+      state: present
+
+  - name: get info on an instance
+    gcp_sql_instance_info:
+      project: ascn-330814
+      auth_kind: serviceaccount
+      service_account_file: "./service.json"
+    register: info
+
+  - name: Add host db
+    add_host:
+      name: '{{ info.resources[0].ipAddresses[0].ipAddress }}'
+      groups: db
+
+    

@@ -1,0 +1,2 @@
+[gcp_vm]
+34.140.25.95     ansible_connection=ssh        ansible_user=melanipereira98 

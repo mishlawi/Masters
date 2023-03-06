@@ -1,0 +1,31 @@
+- name: download files
+  shell: |
+    wget https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.16.2-linux-x86_64.tar.gz
+    tar -xvzf metricbeat-7.16.2-linux-x86_64.tar.gz
+    
+- name: Copy Beats configuration files
+  template:
+    src: metricbeat
+    dest: metricbeat-7.16.2-linux-x86_64/metricbeat.yml
+
+
+- name: install java
+  apt:
+    name: default-jdk
+    update_cache: yes
+
+#- name: Wait for kibana to respond
+#    wait_for:
+#      host: "{{ groups['elk'][0] }}"
+#      port: 5601
+
+- name: setup metricbeat
+  shell: 
+    cmd: ./metricbeat setup
+    chdir: metricbeat-7.16.2-linux-x86_64
+
+- name: run metricbeat
+  shell: 
+    cmd: nohup ./metricbeat -e </dev/null >/dev/null 2>&1 &
+    chdir: metricbeat-7.16.2-linux-x86_64
+    

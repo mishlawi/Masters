@@ -1,0 +1,16 @@
+vars_file:
+  - ../vars.yml
+plugin: gcp_compute             # name the plugin you want to use (use `ansible-doc -t inventory -l` to list available plugins)
+projects:
+  - ascn-330814            # Id of your gcp project
+regions:                        # regions from your project you want to fetch inventory from (you can also use zones instead of regions if you target one or several specific zones)        
+  - europe-west1
+hostnames:
+  - public_ip
+keyed_groups:
+  - key: name
+filters: []
+auth_kind: serviceaccount       # gcp authentication kind. with service account you should provide the service account json key file to authenticate
+service_account_file: ./service.json   # Service account json keyfile
+groups:
+  vm: networkInterfaces[0].accessConfigs[0].natIP

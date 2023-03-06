@@ -1,0 +1,16 @@
+dependencies:
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  
+vm_name: wiki
+sql_name: teste256
+zone: europe-west1-b
+region: europe-west1
+project: ascn-330814
+file: ./service.json
+db_name: postgres
+db_name: ansible
+db_password: pass
+auth_kind: serviceaccount

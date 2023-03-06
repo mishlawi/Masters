@@ -1,0 +1,70 @@
+---
+- hosts: gcp_vm
+  become: yes
+  vars:
+    docker:
+      - ca-certificates
+      - curl 
+      - gnupg
+      - lsb-release
+  tasks:
+    - name: install dependencies for docker  
+      apt:
+        update_cache: yes
+        name: "{{ item }}"
+        state: latest
+      loop: "{{ docker }}"
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+    - name: Update apt and install docker-ce
+      apt: 
+        update_cache: yes 
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: latest
+
+    #- name: remove all containers
+    #  shell: docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q) && docker rmi $(docker images -q)
+
+    - name: create docker network
+      shell: docker network create wiki_net || true
+    #  command: "{{ item }}" 
+    #  with_items: 
+    #    - docker network rm wiki_net
+    #    - docker network create wiki_net
+
+    - name: docker postgres
+      command: docker pull postgres
+    
+    - name: create docker container database
+      shell: docker run --name wikidb --net wiki_net -p 5432:5432 -e POSTGRES_PASSWORD=wiki -e POSTGRES_DB=wiki -e POSTGRES_USER=root -d postgres:latest || true
+    
+    - name: copy Dockerfile
+      copy:
+          src: Dockerfile
+          dest: wiki/
+    
+    - name: copy edit_configs
+      copy:
+          src: edit_configs.sh
+          dest: wiki/
+      
+    - name: create docker container wiki
+      command: docker build ./wiki -t wiki
+  
+    - name: run docker wiki
+      shell: "{{ item }}"
+      with_items:
+        - docker stop wikiapp || true
+        - docker rm wikiapp || true
+        - docker run --net wiki_net --name wikiapp -d wiki
+      args:
+        chdir: wiki/
