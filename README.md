@@ -47,7 +47,7 @@ Realizado com:
 
 # Perfis de especialização / Specializations:
 
-### Criptografia e Segurança / Cryptography and Security:
+### **Criptografia e Segurança** / **_Cryptography and Security_**:
 
 #### EC - Estruturas Criptográficas / *Cryptographic Structures*
 _Projetos práticos/Pratical assignments_
@@ -70,7 +70,7 @@ Realizado com:
 * [Melânia Pereira](https://github.com/melpereira7)
 * Paulo Pereira
 
-### Engenharia de Linguagens/ *Language Engineering* 
+### **Engenharia de Linguagens** / **_Language Engineering_** 
 
 
 #### Engenharia Gramatical / *Grammatical Engineering*
