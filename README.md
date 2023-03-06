@@ -109,4 +109,14 @@ Realizado com:
 
 ---
 
+#### Representação e Processsamento de Conhecimento na Web/ *Representation and Processing of Knowledge on the Web*
+_Projetos práticos/Pratical assignments_
+
+Realizado com:
+* [Angélica Cunha](https://github.com/angelicasc22)
+* [Tiago Barata](https://github.com/tiagomqbarata)
+
+---
+
+
 
