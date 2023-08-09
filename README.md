@@ -1,4 +1,4 @@
-# Master's
+# Masters
 
 _Integrated Master's degree academic year 2021/2022_
 
