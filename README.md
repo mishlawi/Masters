@@ -1,6 +1,6 @@
 # Masters
 
-_Integrated Master's degree academic year 2021/2022_
+_Integrated Masters degree academic year 2021/2022_
 
 _Mestrado Integrado ano letivo 2021/2022_
 
